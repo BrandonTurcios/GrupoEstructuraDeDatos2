@@ -6,7 +6,7 @@ using namespace std;
 
 void Cuentas::agregarEmpleados()
 {
-	int nCuenta;
+	char nCuenta[5];
 	char nombreCliente[30];
 	float saldo;
 
@@ -27,6 +27,7 @@ void Cuentas::agregarEmpleados()
 	if (existe(nuevo.nCuenta))
 	{
 		cout << "Codigo invalido!\n";
+		return;
 	}
 	else
 	{
@@ -41,7 +42,7 @@ void Cuentas::depositar()
 {
 	fstream archivoEmpleado("cuentas.bin", ios::in | ios::out | ios::binary);
 	float montodepositar;
-	int nCuenta;
+	char nCuenta[5];
 
 	cout << "indique el numero de cuenta: ";
 	cin >> nCuenta;
@@ -59,15 +60,17 @@ void Cuentas::depositar()
 
 	while (!archivoEmpleado.eof())
 	{
-		if (actual.nCuenta == nCuenta)
+		if (strcmp(actual.nCuenta,nCuenta)==0)
 		{
 			cout << "indique monto a depositar: ";
 			cin >> montodepositar;
 			actual.saldo += montodepositar;
+	
 			cout << "Monto depositado!\n";
 
 			archivoEmpleado.seekp(posicionArchivo, ios::beg);
 			archivoEmpleado.write(reinterpret_cast<const char*>(&actual), sizeof(datos));
+			agregarHistorial(actual.nCuenta,0,montodepositar);
 			archivoEmpleado.close();
 			return;
 		}
@@ -86,7 +89,7 @@ void Cuentas::retirar()
 
 	fstream archivoEmpleado("cuentas.bin", ios::in | ios::out | ios::binary);
 	float montoretirar;
-	int nCuenta;
+	char nCuenta[5];
 
 	cout << "indique el numero de cuenta: ";
 	cin >> nCuenta;
@@ -104,7 +107,7 @@ void Cuentas::retirar()
 
 	while (!archivoEmpleado.eof())
 	{
-		if (actual.nCuenta == nCuenta)
+		if (strcmp(actual.nCuenta, nCuenta) == 0)
 		{
 			cout << "indique monto a retirar: ";
 			cin >> montoretirar;
@@ -120,6 +123,7 @@ void Cuentas::retirar()
 
 				archivoEmpleado.seekp(posicionArchivo, ios::beg);
 				archivoEmpleado.write(reinterpret_cast<const char*>(&actual), sizeof(datos));
+				agregarHistorial(actual.nCuenta, 1, montoretirar);
 				archivoEmpleado.close();
 				return;
 			}
@@ -137,14 +141,17 @@ void Cuentas::actualizarSaldo()
 
 	int opcion;
 
-	cout << "presione 1 si desea depositar y presione 2 si desea retirar\n";
+	cout << "presione 0 si desea depositar y presione 1 si desea retirar\n";
 	cin >> opcion;
 
 	switch (opcion)
 	{
-	case 1: depositar();
+	case 0: depositar();
 		break;
-	case 2: retirar();
+	case 1: retirar();
+		break;
+	default:
+		cout << "OPCION INVALIDA";
 		break;
 	}
 
@@ -177,7 +184,7 @@ void Cuentas::leer()
 
 }
 
-bool Cuentas::existe(int codigo_)
+bool Cuentas::existe(char codigo_[5])
 {
 	datos actual;
 
@@ -192,9 +199,11 @@ bool Cuentas::existe(int codigo_)
 
 		ArchivoCuentas.read(reinterpret_cast<char*>(&actual), sizeof(datos));
 
-		if (actual.nCuenta == codigo_) {
-			ArchivoCuentas.close();
+		if (strcmp(actual.nCuenta, codigo_) == 0)
+		{
 			return true;
+			ArchivoCuentas.close();
+			
 		}
 
 	} while (!ArchivoCuentas.eof());
@@ -229,7 +238,7 @@ bool Cuentas::existeNombre(char nombre_[30])
 
 void Cuentas::getSaldo()
 {
-	int _nCuenta;
+	char _nCuenta[5];
 	cout << "Ingresar numero de cuenta:" << endl;
 	cin >> _nCuenta;
 
@@ -244,7 +253,7 @@ void Cuentas::getSaldo()
 	do {
 
 		ArchivoCuentas.read(reinterpret_cast<char*>(&actual), sizeof(datos));
-		if (actual.nCuenta == _nCuenta) {
+		if (strcmp(actual.nCuenta, _nCuenta) == 0) {
 			cout << actual.saldo;
 			ArchivoCuentas.close();
 		}
@@ -252,5 +261,50 @@ void Cuentas::getSaldo()
 	} while (!ArchivoCuentas.eof());
 	ArchivoCuentas.close();
 	//cout << "ErrorAAAA";
+
+}
+
+void Cuentas::historialTransacciones()
+{
+	ifstream transacciones("transacciones.bin", ios::in | ios::binary);
+
+	if (!transacciones)
+	{
+		cout << "Error al intentar abrir el archivo transacciones.bin\n";
+		return;
+	}
+
+	transacciones.seekg(0, ios::beg);
+
+	historial actual;
+	transacciones.read(reinterpret_cast<char*>(&actual), sizeof(historial));
+	while (!transacciones.eof())
+	{
+		cout << "datos { codigo: " << actual.nCuenta << ", tipo de transaccion: " <<
+			actual.tipo << ", monto: " << actual.saldo <<
+			" }\n";
+
+		transacciones.read(reinterpret_cast<char*>(&actual), sizeof(historial));
+	}
+
+	transacciones.close();
+}
+
+void Cuentas::agregarHistorial(char nCuenta[5], bool tipo, float saldo)
+{
+	
+	ofstream transacciones("transacciones.bin", ios::out | ios::app | ios::binary);
+
+	if (!transacciones)
+	{
+		cout << "Error al intentar abrir el archivo transacciones.bin\n";
+		return;
+	}
+
+	historial nuevo;
+	strcpy_s(nuevo.nCuenta,strlen(nCuenta)+1 , nCuenta);
+	nuevo.tipo = tipo;
+	nuevo.saldo = saldo;
+	transacciones.write(reinterpret_cast<const char*>(&nuevo), sizeof(historial));
 
 }
