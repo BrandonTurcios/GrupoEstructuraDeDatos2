@@ -6,6 +6,10 @@ Metadata::Metadata(const char nombre[], const char fecha[], int entradas, unsign
 		memcpy(fechaCreacion, fecha, strlen(fecha) + 1);
 }
 
+Metadata::Metadata()
+{
+}
+
 char* Metadata::toChar()
 {
 	char* charResult = new char[sizeof(Metadata)];
@@ -42,7 +46,7 @@ void Metadata::crearDisco()
 void Metadata::guardarDisco()
 {
 	file->open("w");
-	Metadata* newname = new Metadata("miDisco.bin","18/12/21",100,440,123 ,1,2,3);
+	Metadata* newname = new Metadata("miDisco.bin","18/12/21",100,100,123 ,1,2,3);
 	file->write(newname->toChar(), 0, newname->getSizeOf());
 
 	//Metadata* newname = new Metadata("test.bin","18/12/21",100,405540,123 ,1,2,3);
