@@ -1,5 +1,10 @@
 #include "Metadata.h"
 
+Metadata::Metadata(const char nombre[], const char fecha[], int entradas, unsigned int tamano, int bloquesD, int bloquesI1, int bloquesI2, int bloquesI3): nombreDisco(nombre),
+{
+		memcpy(nombreDisco, nombre, strlen(nombre) + 1);
+}
+
 char* Metadata::toChar()
 {
 	char* charResult = new char[sizeof(Metadata)];
