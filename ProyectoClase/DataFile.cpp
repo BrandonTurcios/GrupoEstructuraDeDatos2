@@ -9,7 +9,7 @@ DataFile::DataFile(const char* _path) : path(_path)
 {
 
 }
-
+// hola
 DataFile::~DataFile()
 {
 	delete path;
