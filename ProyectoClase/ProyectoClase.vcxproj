@@ -139,9 +139,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="DataFile.h" />
     <ClInclude Include="Metadata.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="DataFile.cpp" />
     <ClCompile Include="Metadata.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -1,8 +1,10 @@
 #include <iostream>
-
+#include "DataFile.h"
+#include <iostream>
 class Metadata
 {
 private:
+	DataFile* file;
 	char nombreDisco[20];
 	char fechaCreacion[8]; //ddMMyyyy
 	//entradas de directorios
@@ -19,6 +21,9 @@ public:
 	Metadata();
 	char* toChar();
 	void fromChar(char*);
+	void crearDisco();
+	void guardarDisco();
+	int getSizeOf();
 
 };
 

@@ -27,3 +27,27 @@ void Metadata::fromChar(char* readChar)
 	memcpy(&cantidadBloquesInd2Nivel, &readChar[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel)], sizeof(cantidadBloquesInd2Nivel));
 	memcpy(&cantidadBloquesInd3Nivel, &readChar[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd2Nivel)], sizeof(cantidadBloquesInd3Nivel));
 }
+
+void Metadata::crearDisco()
+{
+	file = new DataFile("miDisco.bin");
+}
+
+void Metadata::guardarDisco()
+{
+	file->open("w");
+	Metadata* newname = new Metadata(100, "Allan Brito", 800);;
+	file->write(newname->toChar(), 0, newname->getSizeOf());
+
+	/*newname = new Employee(101, "Michael Jackson", 1200);;
+	file->write(newname->toChar(), newname->getSizeOf(), newname->getSizeOf());
+
+	newname = new Employee(102, "Miguel Alvarado", 1500);;
+	file->write(newname->toChar(), newname->getSizeOf() * 2, newname->getSizeOf());*/
+	file->close();
+}
+
+int Metadata::getSizeOf()
+{
+	return sizeof(Metadata);
+}
