@@ -40,7 +40,7 @@ void Metadata::fromChar(char* readChar)
 
 void Metadata::crearDisco()
 {
-	file = new DataFile("miDisco.bin");
+	file = new DataFile("miDiscoXD.bin");
 }
 
 void Metadata::guardarDisco()
