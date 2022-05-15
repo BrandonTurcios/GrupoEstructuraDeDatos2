@@ -1,8 +1,9 @@
 #include "Metadata.h"
 
-Metadata::Metadata(const char nombre[], const char fecha[], int entradas, unsigned int tamano, int bloquesD, int bloquesI1, int bloquesI2, int bloquesI3): nombreDisco(nombre),
+Metadata::Metadata(const char nombre[], const char fecha[], int entradas, unsigned int tamano, int bloquesD, int bloquesI1, int bloquesI2, int bloquesI3): cantidadBloquesDirectos(bloquesD),cantidadBloquesInd1Nivel(bloquesI1),cantidadBloquesInd2Nivel(bloquesI2),cantidadBloquesInd3Nivel(bloquesI3)
 {
 		memcpy(nombreDisco, nombre, strlen(nombre) + 1);
+		memcpy(fechaCreacion, fecha, strlen(fecha) + 1);
 }
 
 char* Metadata::toChar()
@@ -41,13 +42,13 @@ void Metadata::crearDisco()
 void Metadata::guardarDisco()
 {
 	file->open("w");
-	Metadata* newname = new Metadata(100, "Allan Brito", 800);;
+	Metadata* newname = new Metadata("miDisco.bin","18/12/21",100,440,123 ,1,2,3);
 	file->write(newname->toChar(), 0, newname->getSizeOf());
 
-	/*newname = new Employee(101, "Michael Jackson", 1200);;
-	file->write(newname->toChar(), newname->getSizeOf(), newname->getSizeOf());
+	//Metadata* newname = new Metadata("test.bin","18/12/21",100,405540,123 ,1,2,3);
+	//file->write(newname->toChar(), newname->getSizeOf(), newname->getSizeOf());
 
-	newname = new Employee(102, "Miguel Alvarado", 1500);;
+	/*newname = new Employee(102, "Miguel Alvarado", 1500);;
 	file->write(newname->toChar(), newname->getSizeOf() * 2, newname->getSizeOf());*/
 	file->close();
 }

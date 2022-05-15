@@ -19,6 +19,7 @@ private:
 
 public:
 	Metadata(const char[],const char[],int, unsigned int, int,int,int,int);
+	Metadata();
 	char* toChar();
 	void fromChar(char*);
 	void crearDisco();

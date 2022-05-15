@@ -144,6 +144,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="DataFile.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Metadata.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
