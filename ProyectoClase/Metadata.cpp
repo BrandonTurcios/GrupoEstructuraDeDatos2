@@ -1,7 +1,8 @@
 #include "Metadata.h"
 
-Metadata::Metadata(const char nombre[], const char fecha[], int entradas, unsigned int tamano, int bloquesD, int bloquesI1, int bloquesI2, int bloquesI3): cantidadBloquesDirectos(bloquesD),cantidadBloquesInd1Nivel(bloquesI1),cantidadBloquesInd2Nivel(bloquesI2),cantidadBloquesInd3Nivel(bloquesI3)
+Metadata::Metadata(const char nombre[], int entradas): cantidadEntradasDirectorio(entradas),tamanoBloque(4096),cantidadBloquesDirectos(33308*entradas),cantidadBloquesInd1Nivel(2081 *entradas),cantidadBloquesInd2Nivel(65*entradas),cantidadBloquesInd3Nivel(entradas)
 {
+		const char* fecha = "15052022";
 		memcpy(nombreDisco, nombre, strlen(nombre) + 1);
 		memcpy(fechaCreacion, fecha, strlen(fecha) + 1);
 }
@@ -20,7 +21,7 @@ char* Metadata::toChar()
 	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque)], &cantidadBloquesDirectos, sizeof(cantidadBloquesDirectos));
 	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos)], &cantidadBloquesInd1Nivel, sizeof(cantidadBloquesInd1Nivel));
 	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel)], &cantidadBloquesInd2Nivel, sizeof(cantidadBloquesInd2Nivel));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd3Nivel)], &tamanoBloque, sizeof(cantidadBloquesInd3Nivel));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd3Nivel)], &cantidadBloquesInd3Nivel, sizeof(cantidadBloquesInd3Nivel));
 
 	return charResult;
 
@@ -40,13 +41,13 @@ void Metadata::fromChar(char* readChar)
 
 void Metadata::crearDisco()
 {
-	file = new DataFile("miDiscoXD.bin");
+	file = new DataFile("miDiscoA.bin");
 }
 
 void Metadata::guardarDisco()
 {
 	file->open("w");
-	Metadata* newname = new Metadata("miDisco.bin","18/12/21",100,4096,123 ,1,2,3);
+	Metadata* newname = new Metadata("miDiscoA.bin",8);
 	file->write(newname->toChar(), 0, newname->getSizeOf());
 
 	//Metadata* newname = new Metadata("test.bin","18/12/21",100,405540,123 ,1,2,3);
@@ -61,3 +62,43 @@ int Metadata::getSizeOf()
 {
 	return sizeof(Metadata);
 }
+
+void Metadata::read(const char* _nombre)
+{
+	Metadata* toFind = new Metadata();
+	int CurrentPosition = 0;
+	file->open("r");
+	toFind->fromChar(file->read(CurrentPosition, toFind->getSizeOf()));
+	bool found = false;
+	CurrentPosition += toFind->getSizeOf();
+	while (!file->isEOF())
+	{
+
+		//strcmp(toFind->getNombre(), _nombre) == 0
+		if (strcmp(toFind->getNombre(), _nombre) == 0)
+		{
+			toFind->print();
+			found = true;
+			break;
+		}
+		toFind->fromChar(file->read(CurrentPosition, toFind->getSizeOf()));
+		CurrentPosition += toFind->getSizeOf();
+
+	}
+	if (!found)
+		cout << "Not found";
+
+	file->close();
+}
+
+void Metadata::print()
+{
+	cout << "Disco{ nombre:" << nombreDisco << ", fecha:" << fechaCreacion << " cantidad:" << cantidadEntradasDirectorio << " tamano:" << tamanoBloque << " bloqueD:" << cantidadBloquesDirectos << " bloqueI1:" << cantidadBloquesInd1Nivel << " bloqueI2:" << cantidadBloquesInd2Nivel << " bloqueI3:" << cantidadBloquesInd3Nivel << "}\n";
+}
+
+const char* Metadata::getNombre()
+{
+	return nombreDisco;
+}
+
+

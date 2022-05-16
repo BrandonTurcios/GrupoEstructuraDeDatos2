@@ -1,6 +1,10 @@
 #include <iostream>
 #include <conio.h>
 #include "Metadata.h"
+#include <iomanip>
+#include <ctime>
+#include <chrono>
+
 using namespace std;
 int main()
 {
@@ -8,4 +12,7 @@ int main()
 
 	hola.crearDisco();
 	hola.guardarDisco();
+	hola.read("miDiscoA.bin");
+   
+
 }
