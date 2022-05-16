@@ -2,7 +2,17 @@
 
 Metadata::Metadata(const char nombre[], int entradas): cantidadEntradasDirectorio(entradas),tamanoBloque(4096),cantidadBloquesDirectos(33308*entradas),cantidadBloquesInd1Nivel(2081 *entradas),cantidadBloquesInd2Nivel(65*entradas),cantidadBloquesInd3Nivel(entradas)
 {
-		const char* fecha = "15052022";
+		const char* fecha;
+		std::string fecha_;
+		time_t rawtime;
+		struct tm ltm;
+		time(&rawtime);
+		localtime_s(&ltm, &rawtime);
+		std::ostringstream ss;
+		ss << std::put_time(&ltm, "%d%m%Y");
+		fecha_ = ss.str();
+		fecha = fecha_.c_str();
+
 		memcpy(nombreDisco, nombre, strlen(nombre) + 1);
 		memcpy(fechaCreacion, fecha, strlen(fecha) + 1);
 }
@@ -93,7 +103,7 @@ void Metadata::read(const char* _nombre)
 
 void Metadata::print()
 {
-	cout << "Disco{ nombre:" << nombreDisco << ", fecha:" << fechaCreacion << " cantidad:" << cantidadEntradasDirectorio << " tamano:" << tamanoBloque << " bloqueD:" << cantidadBloquesDirectos << " bloqueI1:" << cantidadBloquesInd1Nivel << " bloqueI2:" << cantidadBloquesInd2Nivel << " bloqueI3:" << cantidadBloquesInd3Nivel << "}\n";
+	cout << "Metada{ nombre:" << nombreDisco << ", fecha:" << fechaCreacion << " cantidad:" << cantidadEntradasDirectorio << " tamano:" << tamanoBloque << " bloqueD:" << cantidadBloquesDirectos << " bloqueI1:" << cantidadBloquesInd1Nivel << " bloqueI2:" << cantidadBloquesInd2Nivel << " bloqueI3:" << cantidadBloquesInd3Nivel << "}\n";
 }
 
 const char* Metadata::getNombre()

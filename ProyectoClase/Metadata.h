@@ -1,7 +1,9 @@
-#include <iostream>
 #include "DataFile.h"
 #include <iostream>
-#include <ctime>
+#include<sstream>
+#include <iomanip>
+
+using namespace std;
 class Metadata
 {
 private:
