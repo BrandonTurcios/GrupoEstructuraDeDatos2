@@ -111,4 +111,18 @@ const char* Metadata::getNombre()
 	return nombreDisco;
 }
 
+MapaBits::MapaBits_BD::MapaBits_BD()
+{
 
+}
+
+char* MapaBits::MapaBits_BD::toChar()
+{
+	char* charResult = new char[sizeof(MapaBits_BD)];
+	return nullptr;
+}
+
+void MapaBits::MapaBits_BD::fromChar(char* readChar)
+{
+
+}

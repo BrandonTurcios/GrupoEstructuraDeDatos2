@@ -1,17 +1,12 @@
 #include <iostream>
 #include <conio.h>
 #include "Metadata.h"
-#include <iomanip>
-#include <ctime>
-#include <chrono>
-#include <sstream>
 
 using namespace std;
 int main()
 {
 	Metadata test;
 
-	
 	char crearDisco[28];
 	int opcion;
 	do {
@@ -53,3 +48,8 @@ int main()
    
 
 }
+
+//void convertir()
+//{
+//
+//}
