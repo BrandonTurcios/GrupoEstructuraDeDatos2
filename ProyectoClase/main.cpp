@@ -2,10 +2,14 @@
 #include <conio.h>
 #include "Metadata.h"
 
+//#include "MapaBits.h"
+
 using namespace std;
 int main()
 {
 	Metadata test;
+	Metadata::
+
 
 	char crearDisco[28];
 	int opcion;
@@ -28,6 +32,9 @@ int main()
 			break;
 		case 2:
 			test.read("miDiscoA.bin");
+
+			
+
 			break;
 		case 3:
 			break;

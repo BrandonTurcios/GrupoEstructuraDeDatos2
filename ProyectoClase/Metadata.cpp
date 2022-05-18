@@ -1,5 +1,6 @@
 #include "Metadata.h"
 
+
 Metadata::Metadata(const char nombre[], int entradas): cantidadEntradasDirectorio(entradas),tamanoBloque(4096),cantidadBloquesDirectos(33308*entradas),cantidadBloquesInd1Nivel(2081 *entradas),cantidadBloquesInd2Nivel(65*entradas),cantidadBloquesInd3Nivel(entradas)
 {
 		const char* fecha;
@@ -118,11 +119,42 @@ MapaBits::MapaBits_BD::MapaBits_BD()
 
 char* MapaBits::MapaBits_BD::toChar()
 {
-	char* charResult = new char[sizeof(MapaBits_BD)];
+	/*char* charResult = new char[sizeof(MapaBits_BD)];
+	return nullptr;*/
+
+
+//	MapaBits* bm = new MapaBits();
+	MapaBits_BD* mapaBD = new MapaBits_BD();
+	mapaBD->ptrs = new char[33308 / 8];
+
+//	bm->MapaBits::MapaBits_BD
+ 
+
+		char* charResult = new char[sizeof(MapaBits::MapaBits_BD)];
+	memcpy(&charResult[sizeof(Metadata)], &mapaBD->ptrs, sizeof(mapaBD->ptrs));
+
+	/*memcpy(&charResult[sizeof(nombreDisco)], fechaCreacion, sizeof(fechaCreacion));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion)], &cantidadEntradasDirectorio, sizeof(cantidadEntradasDirectorio));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio)], &tamanoBloque, sizeof(tamanoBloque));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque)], &cantidadBloquesDirectos, sizeof(cantidadBloquesDirectos));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos)], &cantidadBloquesInd1Nivel, sizeof(cantidadBloquesInd1Nivel));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel)], &cantidadBloquesInd2Nivel, sizeof(cantidadBloquesInd2Nivel));
+	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd3Nivel)], &tamanoBloque, sizeof(cantidadBloquesInd3Nivel));*/
+
+
+	return charResult;
+
+
+
 	return nullptr;
+
+
+
 }
 
 void MapaBits::MapaBits_BD::fromChar(char* readChar)
 {
+
+
 
 }
