@@ -69,7 +69,7 @@ private:
 	class MapaBits_BI3
 	{
 	public:
-		MapaBits_BI3();
+		MapaBits_BI3(int nBloquesBI3);
 		char* ptrs; //= new char[nbloquesI3 / 8];
 		char* toChar();
 		void fromChar(char*);

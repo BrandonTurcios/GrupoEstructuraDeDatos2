@@ -114,44 +114,13 @@ const char* Metadata::getNombre()
 
 MapaBits::MapaBits_BD::MapaBits_BD()
 {
-
 }
 
 char* MapaBits::MapaBits_BD::toChar()
 {
-	/*char* charResult = new char[sizeof(MapaBits_BD)];
-	return nullptr;*/
-
-
-//	MapaBits* bm = new MapaBits();
-	MapaBits_BD* mapaBD = new MapaBits_BD();
-	mapaBD->ptrs = new char[33308 / 8];
-
-//	bm->MapaBits::MapaBits_BD
- 
-
-		char* charResult = new char[sizeof(MapaBits::MapaBits_BD)];
-	memcpy(&charResult[sizeof(Metadata)], &mapaBD->ptrs, sizeof(mapaBD->ptrs));
-
-	/*memcpy(&charResult[sizeof(nombreDisco)], fechaCreacion, sizeof(fechaCreacion));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion)], &cantidadEntradasDirectorio, sizeof(cantidadEntradasDirectorio));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio)], &tamanoBloque, sizeof(tamanoBloque));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque)], &cantidadBloquesDirectos, sizeof(cantidadBloquesDirectos));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos)], &cantidadBloquesInd1Nivel, sizeof(cantidadBloquesInd1Nivel));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel)], &cantidadBloquesInd2Nivel, sizeof(cantidadBloquesInd2Nivel));
-	memcpy(&charResult[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd3Nivel)], &tamanoBloque, sizeof(cantidadBloquesInd3Nivel));*/
-
-
-	return charResult;
-
-
-
-	return nullptr;
-
-
 
 }
-//hola hola
+
 
 void MapaBits::MapaBits_BD::fromChar(char* readChar)
 {
@@ -159,3 +128,24 @@ void MapaBits::MapaBits_BD::fromChar(char* readChar)
 
 
 }
+
+MapaBits::MapaBits_BI3::MapaBits_BI3(int nBloquesBI3)
+{
+	ptrs = new char[nBloquesBI3 / 8];
+	for (int i = 0; i < nBloquesBI3 / 8; i++)
+	{
+		ptrs[i] = 0;
+	}
+
+}
+
+char* MapaBits::MapaBits_BI3::toChar()
+{
+	return ptrs;
+}
+
+void MapaBits::MapaBits_BI3::fromChar(char* _mb)
+{
+	ptrs = _mb;
+}
+
