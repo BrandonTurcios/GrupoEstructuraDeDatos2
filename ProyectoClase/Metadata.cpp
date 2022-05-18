@@ -151,7 +151,7 @@ char* MapaBits::MapaBits_BD::toChar()
 
 
 }
-
+//hola hola
 
 void MapaBits::MapaBits_BD::fromChar(char* readChar)
 {
