@@ -107,10 +107,10 @@ private:
 		// lista = new Entrada[md.cantidadEntradasDirectorio];
 	}
 
-	void write()
+	/*void write()
 	{
 
-	}
+	}*/
 
 };
 
