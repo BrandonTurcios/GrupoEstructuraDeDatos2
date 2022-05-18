@@ -112,22 +112,71 @@ const char* Metadata::getNombre()
 	return nombreDisco;
 }
 
-MapaBits::MapaBits_BD::MapaBits_BD()
+MapaBits::MapaBits_BD::MapaBits_BD(int nBloquesBD)
 {
+	ptrs = new char[nBloquesBD / 8];
+	for (int i = 0; i < nBloquesBD / 8; i++)
+	{
+		ptrs[i] = 0;
+	}
+
 }
 
 char* MapaBits::MapaBits_BD::toChar()
 {
-
+	return ptrs;
 }
 
 
 void MapaBits::MapaBits_BD::fromChar(char* readChar)
 {
 
-
+	ptrs = readChar;
 
 }
+// -----------------------------------------------------------------
+MapaBits::MapaBits_BI1::MapaBits_BI1(int nBloquesBI1)
+{
+	ptrs = new char[nBloquesBI1 / 8];
+	for (int i = 0; i < nBloquesBI1 / 8; i++)
+	{
+		ptrs[i] = 0;
+	}
+
+}
+
+char* MapaBits::MapaBits_BI1::toChar()
+{
+	return ptrs;
+}
+
+void MapaBits::MapaBits_BI1::fromChar(char* _mb)
+{
+	ptrs = _mb;
+}
+
+//------------------------------------------------------------------
+
+MapaBits::MapaBits_BI2::MapaBits_BI2(int nBloquesBI2)
+{
+	ptrs = new char[nBloquesBI2 / 8];
+	for (int i = 0; i < nBloquesBI2 / 8; i++)
+	{
+		ptrs[i] = 0;
+	}
+}
+
+char* MapaBits::MapaBits_BI2::toChar()
+{
+	return ptrs;
+}
+
+void MapaBits::MapaBits_BI2::fromChar(char* _mb)
+{
+	ptrs = _mb;
+}
+
+//------------------------------------------------------------------
 
 MapaBits::MapaBits_BI3::MapaBits_BI3(int nBloquesBI3)
 {

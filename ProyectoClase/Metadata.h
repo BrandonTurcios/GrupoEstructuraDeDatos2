@@ -42,7 +42,7 @@ private:
 	class MapaBits_BD
 	{
 	public:
-		MapaBits_BD();
+		MapaBits_BD(int nBloquesBD);
 		char* ptrs; // =new char[nb];
 
 		char* toChar();
@@ -51,7 +51,7 @@ private:
 	class MapaBits_BI1
 	{
 	public:
-		MapaBits_BI1();
+		MapaBits_BI1(int nBloquesBI1);
 		char* ptrs; // =new char[ca>lado];
 
 		char* toChar();
@@ -60,7 +60,7 @@ private:
 	class MapaBits_BI2
 	{
 	public:
-		MapaBits_BI2();
+		MapaBits_BI2(int nBloquesBI2);
 		char* ptrs; // =new char[calculado];
 
 		char* toChar();
