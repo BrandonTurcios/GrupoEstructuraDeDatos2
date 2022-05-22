@@ -8,7 +8,7 @@ using namespace std;
 int main()
 {
 	Metadata test;
-	Metadata::
+	//Metadata::
 
 
 	char crearDisco[28];
