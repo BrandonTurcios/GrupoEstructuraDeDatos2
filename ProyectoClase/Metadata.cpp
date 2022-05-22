@@ -112,13 +112,26 @@ const char* Metadata::getNombre()
 	return nombreDisco;
 }
 
+//--------------------------------------------------------------------------------------------
+MapaBits::MapaBits_BD::MapaBits_BD()
+{
+}
+
 MapaBits::MapaBits_BD::MapaBits_BD(int nBloquesBD)
 {
-	ptrs = new char[nBloquesBD / 8];
-	for (int i = 0; i < nBloquesBD / 8; i++)
+	ptrs = new char[nBloquesBD + 1];
+	for (int i = 0; i < nBloquesBD; i++)
 	{
-		ptrs[i] = 0;
+		ptrs[i] = '0';
 	}
+	ptrs[nBloquesBD] = '\0';
+
+}
+
+void MapaBits::MapaBits_BD::fromChar(char* readChar)
+{
+
+	ptrs = readChar;
 
 }
 
@@ -127,48 +140,45 @@ char* MapaBits::MapaBits_BD::toChar()
 	return ptrs;
 }
 
-
-void MapaBits::MapaBits_BD::fromChar(char* readChar)
-{
-
-	ptrs = readChar;
-
-}
 // -----------------------------------------------------------------
+MapaBits::MapaBits_BI1::MapaBits_BI1()
+{
+}
+
 MapaBits::MapaBits_BI1::MapaBits_BI1(int nBloquesBI1)
 {
-	ptrs = new char[nBloquesBI1 / 8];
-	for (int i = 0; i < nBloquesBI1 / 8; i++)
+	ptrs = new char[nBloquesBI1 + 1];
+	for (int i = 0; i < nBloquesBI1; i++)
 	{
-		ptrs[i] = 0;
+		ptrs[i] = '0';
 	}
-
-}
-
-char* MapaBits::MapaBits_BI1::toChar()
-{
-	return ptrs;
+	ptrs[nBloquesBI1] = '\0';
 }
 
 void MapaBits::MapaBits_BI1::fromChar(char* _mb)
 {
 	ptrs = _mb;
 }
+char* MapaBits::MapaBits_BI1::toChar()
+{
+	return ptrs;
+}
+
+
 
 //------------------------------------------------------------------
+MapaBits::MapaBits_BI2::MapaBits_BI2()
+{
+}
 
 MapaBits::MapaBits_BI2::MapaBits_BI2(int nBloquesBI2)
 {
-	ptrs = new char[nBloquesBI2 / 8];
-	for (int i = 0; i < nBloquesBI2 / 8; i++)
+	ptrs = new char[nBloquesBI2 + 1];
+	for (int i = 0; i < nBloquesBI2; i++)
 	{
-		ptrs[i] = 0;
+		ptrs[i] = '0';
 	}
-}
-
-char* MapaBits::MapaBits_BI2::toChar()
-{
-	return ptrs;
+	ptrs[nBloquesBI2] = '\0';
 }
 
 void MapaBits::MapaBits_BI2::fromChar(char* _mb)
@@ -176,21 +186,26 @@ void MapaBits::MapaBits_BI2::fromChar(char* _mb)
 	ptrs = _mb;
 }
 
+char* MapaBits::MapaBits_BI2::toChar()
+{
+	return ptrs;
+}
+
+
 //------------------------------------------------------------------
+
+MapaBits::MapaBits_BI3::MapaBits_BI3()
+{
+}
 
 MapaBits::MapaBits_BI3::MapaBits_BI3(int nBloquesBI3)
 {
-	ptrs = new char[nBloquesBI3 / 8];
-	for (int i = 0; i < nBloquesBI3 / 8; i++)
+	ptrs = new char[nBloquesBI3 + 1];
+	for (int i = 0; i < nBloquesBI3; i++)
 	{
-		ptrs[i] = 0;
+		ptrs[i] = '0';
 	}
-
-}
-
-char* MapaBits::MapaBits_BI3::toChar()
-{
-	return ptrs;
+	ptrs[nBloquesBI3] = '\0';
 }
 
 void MapaBits::MapaBits_BI3::fromChar(char* _mb)
@@ -198,3 +213,108 @@ void MapaBits::MapaBits_BI3::fromChar(char* _mb)
 	ptrs = _mb;
 }
 
+char* MapaBits::MapaBits_BI3::toChar()
+{
+	return ptrs;
+}
+
+
+//----------------------------------------------------------------------
+
+MapaBits::MapaBits(int nBD, int nBI1, int nBI2, int nBI3) : B1(((nBD / 8) % 2 == 0) ? nBD / 8 : nBD / 8 + 1), B2(((nBI1 / 8) % 2 == 0) ? nBI1 / 8 : nBI1 / 8 + 1), B3(((nBI2 / 8) % 2 == 0) ? nBI2 / 8 : nBI2 / 8 + 1), B4(((nBI3 / 8) % 2 == 0) ? nBI3 / 8 : nBI3 / 8 + 1)
+{
+
+
+	file = new DataFile("miDiscoA.bin");
+
+	MapaBits_BD* BD = new MapaBits_BD(B1);
+	MapaBits_BI1* BI1 = new MapaBits_BI1(B2);
+
+	MapaBits_BI2* BI2 = new MapaBits_BI2(B3);
+	MapaBits_BI3* BI3 = new MapaBits_BI3(B4);
+	char* charResult = new char[sizeof(Metadata)];
+
+	ptrsCompleto = new char[B1 + B2 + B3 + B4 + 1];
+
+	memcpy(&ptrsCompleto[0], (BD->toChar()), B1);
+	memcpy(&ptrsCompleto[B1], BI1->toChar(), B2);
+	memcpy(&ptrsCompleto[B1 + B2], BI2->toChar(), B3);
+	memcpy(&ptrsCompleto[B1 + B2 + B3], BI3->toChar(), B4 + 1);
+
+	ptrsCompleto[B1 + B2 + B3 + B4] = '\0';
+}
+
+void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
+{
+	cout << "===============LECTURA=============" << endl;
+
+	int currentPosition = sizeof(Metadata);
+
+
+
+	file->open("R");
+
+	MapaBits* toFind = new MapaBits();
+
+	toFind->B1 = (((MBD / 8) % 2 == 0) ? MBD / 8 : MBD / 8 + 1);
+
+	toFind->B2 = (((MBI1 / 8) % 2 == 0) ? MBI1 / 8 : MBI1 / 8 + 1);
+	toFind->B3 = (((MBI2 / 8) % 2 == 0) ? MBI2 / 8 : MBI2 / 8 + 1);
+	toFind->B4 = (((MBI3 / 8) % 2 == 0) ? MBI3 / 8 : MBI3 / 8 + 1);
+
+	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
+	currentPosition += sizeof(Metadata);
+	bool Founded = false;
+
+	while (!file->isEof()) {
+
+
+		toFind->print();
+		Founded = true;
+		break;
+		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
+		currentPosition += toFind->getSizeOf();
+	}
+
+	if (!Founded) {
+		cout << "Employee not Foundedfefeefefefefe!" << endl;
+	}
+	file->close();
+}
+
+MapaBits::MapaBits() {
+	file = new DataFile("miDiscoA.bin");
+
+	ptrsCompleto = new char[B1 + B2 + B3 + B4 + 1];
+}
+
+void MapaBits::GuardarMapaBits()
+{
+	file->open("W");
+
+	MapaBits* newone = new MapaBits(B1 * 8, B2 * 8, B3 * 8, B4 * 8);
+
+	file->write(newone->toChar(), sizeof(Metadata), newone->getSizeOf());
+	file->close();
+}
+
+void MapaBits::imprimirMapaBits()
+{
+	cout << ptrsCompleto << endl;
+}
+
+int MapaBits::getSizeOf()
+{
+	return (B1 + B2 + B3 + B4);
+}
+
+char* MapaBits::toChar()
+{
+	return ptrsCompleto;
+}
+
+void MapaBits::fromChar(char* _ptrsCompleto)
+{
+	ptrsCompleto = _ptrsCompleto;
+	ptrsCompleto[getSizeOf()] = '\0';
+}

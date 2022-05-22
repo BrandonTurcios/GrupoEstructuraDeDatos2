@@ -43,6 +43,7 @@ private:
 	{
 	public:
 		MapaBits_BD(int nBloquesBD);
+		MapaBits_BD();
 		char* ptrs; // =new char[nb];
 
 		char* toChar();
@@ -52,6 +53,7 @@ private:
 	{
 	public:
 		MapaBits_BI1(int nBloquesBI1);
+		MapaBits_BI1();
 		char* ptrs; // =new char[ca>lado];
 
 		char* toChar();
@@ -61,6 +63,7 @@ private:
 	{
 	public:
 		MapaBits_BI2(int nBloquesBI2);
+		MapaBits_BI2();
 		char* ptrs; // =new char[calculado];
 
 		char* toChar();
@@ -70,10 +73,27 @@ private:
 	{
 	public:
 		MapaBits_BI3(int nBloquesBI3);
+		MapaBits_BI3();
 		char* ptrs; //= new char[nbloquesI3 / 8];
 		char* toChar();
 		void fromChar(char*);
+
 	};
+
+public:
+	int B1;
+	int B2;
+	int B3;
+	int B4;
+	MapaBits(int, int, int, int);
+	MapaBits();
+	int getSizeOf();
+	char* toChar();
+	void fromChar(char*);
+	void GuardarMapaBits();
+	void LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3);
+	void imprimirMapaBits();
+
 };
 
 
