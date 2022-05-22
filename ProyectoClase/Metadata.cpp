@@ -266,10 +266,10 @@ void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 	currentPosition += sizeof(Metadata);
 	bool Founded = false;
 
-	while (!file->isEof()) {
+	while (!file->isEOF()) {
 
 
-		toFind->print();
+		toFind->imprimirMapaBits();
 		Founded = true;
 		break;
 		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));

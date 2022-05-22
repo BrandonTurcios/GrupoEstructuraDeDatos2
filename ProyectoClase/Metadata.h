@@ -39,6 +39,8 @@ public:
 class MapaBits
 {
 private:
+	DataFile* file;
+	char* ptrsCompleto;
 	class MapaBits_BD
 	{
 	public:
