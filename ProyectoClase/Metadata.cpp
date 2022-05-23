@@ -117,14 +117,14 @@ MapaBits::MapaBits_BD::MapaBits_BD()
 {
 }
 
-MapaBits::MapaBits_BD::MapaBits_BD(int nBloquesBD)
+MapaBits::MapaBits_BD::MapaBits_BD(int numeroBloquesDirectos)
 {
-	ptrs = new char[nBloquesBD + 1];
-	for (int i = 0; i < nBloquesBD; i++)
+	ptrs = new char[numeroBloquesDirectos + 1];
+	for (int i = 0; i < numeroBloquesDirectos; i++)
 	{
 		ptrs[i] = '0';
 	}
-	ptrs[nBloquesBD] = '\0';
+	ptrs[numeroBloquesDirectos] = '\0';
 
 }
 
@@ -145,14 +145,14 @@ MapaBits::MapaBits_BI1::MapaBits_BI1()
 {
 }
 
-MapaBits::MapaBits_BI1::MapaBits_BI1(int nBloquesBI1)
+MapaBits::MapaBits_BI1::MapaBits_BI1(int numeroBloquesIndirectos1)
 {
-	ptrs = new char[nBloquesBI1 + 1];
-	for (int i = 0; i < nBloquesBI1; i++)
+	ptrs = new char[numeroBloquesIndirectos1 + 1];
+	for (int i = 0; i < numeroBloquesIndirectos1; i++)
 	{
 		ptrs[i] = '0';
 	}
-	ptrs[nBloquesBI1] = '\0';
+	ptrs[numeroBloquesIndirectos1] = '\0';
 }
 
 void MapaBits::MapaBits_BI1::fromChar(char* _mb)
@@ -198,19 +198,19 @@ MapaBits::MapaBits_BI3::MapaBits_BI3()
 {
 }
 
-MapaBits::MapaBits_BI3::MapaBits_BI3(int nBloquesBI3)
+MapaBits::MapaBits_BI3::MapaBits_BI3(int numeroBloquesIndirectos3)
 {
-	ptrs = new char[nBloquesBI3 + 1];
-	for (int i = 0; i < nBloquesBI3; i++)
+	ptrs = new char[numeroBloquesIndirectos3 + 1];
+	for (int i = 0; i < numeroBloquesIndirectos3; i++)
 	{
 		ptrs[i] = '0';
 	}
-	ptrs[nBloquesBI3] = '\0';
+	ptrs[numeroBloquesIndirectos3] = '\0';
 }
 
-void MapaBits::MapaBits_BI3::fromChar(char* _mb)
+void MapaBits::MapaBits_BI3::fromChar(char* _meb)
 {
-	ptrs = _mb;
+	ptrs = _meb;
 }
 
 char* MapaBits::MapaBits_BI3::toChar()
@@ -221,7 +221,7 @@ char* MapaBits::MapaBits_BI3::toChar()
 
 //----------------------------------------------------------------------
 
-MapaBits::MapaBits(int nBD, int nBI1, int nBI2, int nBI3) : B1(((nBD / 8) % 2 == 0) ? nBD / 8 : nBD / 8 + 1), B2(((nBI1 / 8) % 2 == 0) ? nBI1 / 8 : nBI1 / 8 + 1), B3(((nBI2 / 8) % 2 == 0) ? nBI2 / 8 : nBI2 / 8 + 1), B4(((nBI3 / 8) % 2 == 0) ? nBI3 / 8 : nBI3 / 8 + 1)
+MapaBits::MapaBits(int numBloquesDirectos, int numBloquesIndirectos1, int numeroBloquesIndirectos2, int numeroBloquesIndirectos3) : B1(((numBloquesDirectos / 8) % 2 == 0) ? numBloquesDirectos / 8 : numBloquesDirectos / 8 + 1), B2(((numBloquesIndirectos1 / 8) % 2 == 0) ? numBloquesIndirectos1 / 8 : numBloquesIndirectos1 / 8 + 1), B3(((numeroBloquesIndirectos2 / 8) % 2 == 0) ? numeroBloquesIndirectos2 / 8 : numeroBloquesIndirectos2 / 8 + 1), B4(((numeroBloquesIndirectos3 / 8) % 2 == 0) ? numeroBloquesIndirectos3 / 8 : numeroBloquesIndirectos3 / 8 + 1)
 {
 
 
@@ -246,7 +246,7 @@ MapaBits::MapaBits(int nBD, int nBI1, int nBI2, int nBI3) : B1(((nBD / 8) % 2 ==
 
 void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 {
-	cout << "===============LECTURA=============" << endl;
+	cout << "Test Lectura" << endl;
 
 	int currentPosition = sizeof(Metadata);
 
@@ -277,7 +277,7 @@ void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 	}
 
 	if (!Founded) {
-		cout << "Employee not Foundedfefeefefefefe!" << endl;
+		cout << "Employee not found" << endl;
 	}
 	file->close();
 }
