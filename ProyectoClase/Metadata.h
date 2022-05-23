@@ -35,12 +35,11 @@ public:
 };
 
 
-
 class MapaBits
 {
 private:
 	DataFile* file;
-	char* ptrsCompleto;
+	char* ptrsCombinados;
 	class MapaBits_BD
 	{
 	public:
@@ -83,17 +82,17 @@ private:
 	};
 
 public:
-	int B1;
-	int B2;
-	int B3;
-	int B4;
+	int bloque1;
+	int bloque2;
+	int bloque3;
+	int bloque4;
 	MapaBits(int, int, int, int);
 	MapaBits();
 	int getSizeOf();
 	char* toChar();
 	void fromChar(char*);
 	void GuardarMapaBits();
-	void LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3);
+	void LeerMapaBits(int, int, int, int);
 	void imprimirMapaBits();
 
 };
