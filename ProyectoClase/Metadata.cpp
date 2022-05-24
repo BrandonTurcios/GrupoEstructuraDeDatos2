@@ -3,6 +3,7 @@
 
 Metadata::Metadata(const char nombre[], int entradas): cantidadEntradasDirectorio(entradas),tamanoBloque(4096),cantidadBloquesDirectos(33308*entradas),cantidadBloquesInd1Nivel(2081 *entradas),cantidadBloquesInd2Nivel(65*entradas),cantidadBloquesInd3Nivel(entradas)
 {
+		abrirDisco("test.bin");
 		const char* fecha;
 		std::string fecha_;
 		time_t rawtime;
@@ -50,23 +51,28 @@ void Metadata::fromChar(char* readChar)
 	memcpy(&cantidadBloquesInd3Nivel, &readChar[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd2Nivel)], sizeof(cantidadBloquesInd3Nivel));
 }
 
-void Metadata::crearDisco()
+void Metadata::abrirDisco(const char nombre[13])
 {
-	file = new DataFile("miDiscoA.bin");
+	file = new DataFile(nombre);
+	
 }
 
 void Metadata::guardarDisco()
 {
 	file->open("w");
-	Metadata* newname = new Metadata("miDiscoA.bin",8);
-	file->write(newname->toChar(), 0, newname->getSizeOf());
 
-	//Metadata* newname = new Metadata("test.bin","18/12/21",100,405540,123 ,1,2,3);
-	//file->write(newname->toChar(), newname->getSizeOf(), newname->getSizeOf());
-
-	/*newname = new Employee(102, "Miguel Alvarado", 1500);;
-	file->write(newname->toChar(), newname->getSizeOf() * 2, newname->getSizeOf());*/
+	Metadata* newone = new Metadata(nombreDisco,cantidadEntradasDirectorio);
+	file->write(newone->toChar(), 0, newone->getSizeOf());
 	file->close();
+
+	
+
+}
+
+void Metadata::guardarMapaBits()
+{
+	MapaBits* mb = new MapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	mb->GuardarMapaBits();
 }
 
 int Metadata::getSizeOf()
@@ -98,6 +104,8 @@ void Metadata::read(const char* _nombre)
 	}
 	if (!found)
 		cout << "Not found";
+
+	mb->LeerMapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
 
 	file->close();
 }
@@ -223,7 +231,7 @@ char* MapaBits::MapaBits_BI3::toChar()
 
 MapaBits::MapaBits(int numBloquesDirectos, int numBloquesIndirectos1, int numeroBloquesIndirectos2, int numeroBloquesIndirectos3) : bloque1(((numBloquesDirectos / 8) % 2 == 0) ? numBloquesDirectos / 8 : numBloquesDirectos / 8 + 1), bloque2(((numBloquesIndirectos1 / 8) % 2 == 0) ? numBloquesIndirectos1 / 8 : numBloquesIndirectos1 / 8 + 1), bloque3(((numeroBloquesIndirectos2 / 8) % 2 == 0) ? numeroBloquesIndirectos2 / 8 : numeroBloquesIndirectos2 / 8 + 1), bloque4(((numeroBloquesIndirectos3 / 8) % 2 == 0) ? numeroBloquesIndirectos3 / 8 : numeroBloquesIndirectos3 / 8 + 1)
 {
-	file = new DataFile("miDiscoA.bin");
+	file = new DataFile("test.bin");
 
 	MapaBits_BD* bloqueDirecto = new MapaBits_BD(bloque1);
 	MapaBits_BI1* bloqueI1 = new MapaBits_BI1(bloque2);
@@ -274,8 +282,9 @@ void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 	file->close();
 }
 
-MapaBits::MapaBits() {
-	file = new DataFile("miDiscoA.bin");
+MapaBits::MapaBits() 
+{
+	file = new DataFile("test.bin");
 
 	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
 }

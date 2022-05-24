@@ -25,7 +25,8 @@ public:
 	Metadata();
 	char* toChar();
 	void fromChar(char*);
-	void crearDisco();
+	void abrirDisco(const char[]);
+	void guardarMapaBits();
 	void guardarDisco();
 	int getSizeOf();
 	void read(const char*);

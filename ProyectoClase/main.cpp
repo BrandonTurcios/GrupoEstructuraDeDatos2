@@ -7,11 +7,12 @@
 using namespace std;
 int main()
 {
-	Metadata test;
 	//Metadata::
-
-
-	char crearDisco[28];
+	
+	string comando;
+	string comandoUnico;
+	int cantidad;
+	string nombre;
 	int opcion;
 	do {
 		printf("1- Crear disco\n");
@@ -22,41 +23,35 @@ int main()
 		printf("ingrese su opcion:\n");
 
 		scanf_s("%i", &opcion);
-		switch (opcion)
+		if (opcion == 1)
 		{
-		case 1:
-			/*cout << "$ ";
-			cin >> crearDisco;*/
-			test.crearDisco();
+			cout << "$ ";
+			cin >> comandoUnico>>nombre>>cantidad;
+			cout << comandoUnico << endl << nombre << endl<< cantidad << endl;
+			Metadata test(nombre.c_str(), cantidad);
+			test.abrirDisco(nombre.c_str());
 			test.guardarDisco();
-			break;
-		case 2:
-			test.read("miDiscoA.bin");
-
-			
-
-			break;
-		case 3:
-			break;
-		case 4:
-			break;
+			test.guardarMapaBits();
+			test.read("test.bin");
 		}
+		else if (opcion == 2)
+		{
+			//test.abrirDisco("test.bin");
+			
+		
+		}
+		else if (opcion == 3)
+		{
 
+		}
+		else if (opcion == 4)
+		{
+
+		}
 	} while (opcion != 5);
-	return 0;
-
-	//time_t rawtime;
-	//struct tm ltm;
-	//time(&rawtime);
-	//localtime_s(&ltm, &rawtime);
-	//std::ostringstream ss;
-	//ss << std::put_time(&ltm, "%d%m%Y");
-	//std::cout << ss.str() << endl;
-   
-
+		return 0;
+	
 }
 
-//void convertir()
-//{
-//
-//}
+	
+
