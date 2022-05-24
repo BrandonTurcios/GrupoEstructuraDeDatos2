@@ -64,15 +64,12 @@ void Metadata::guardarDisco()
 	Metadata* newone = new Metadata(nombreDisco,cantidadEntradasDirectorio);
 	file->write(newone->toChar(), 0, newone->getSizeOf());
 	file->close();
-
-	
-
 }
 
 void Metadata::guardarMapaBits()
 {
-	MapaBits* mb = new MapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
-	mb->GuardarMapaBits();
+	MapaBits* mapa = new MapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	mapa->guardarMapaBits();
 }
 
 int Metadata::getSizeOf()
@@ -105,7 +102,8 @@ void Metadata::read(const char* _nombre)
 	if (!found)
 		cout << "Not found";
 
-	mb->LeerMapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	MapaBits* mapa = new MapaBits();
+	mapa->leerMapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
 
 	file->close();
 }
@@ -167,12 +165,11 @@ void MapaBits::MapaBits_BI1::fromChar(char* readChar)
 {
 	ptrs = readChar;
 }
+
 char* MapaBits::MapaBits_BI1::toChar()
 {
 	return ptrs;
 }
-
-
 
 //------------------------------------------------------------------
 MapaBits::MapaBits_BI2::MapaBits_BI2()
@@ -198,7 +195,6 @@ char* MapaBits::MapaBits_BI2::toChar()
 {
 	return ptrs;
 }
-
 
 //------------------------------------------------------------------
 
@@ -226,7 +222,6 @@ char* MapaBits::MapaBits_BI3::toChar()
 	return ptrs;
 }
 
-
 //----------------------------------------------------------------------
 
 MapaBits::MapaBits(int numBloquesDirectos, int numBloquesIndirectos1, int numeroBloquesIndirectos2, int numeroBloquesIndirectos3) : bloque1(((numBloquesDirectos / 8) % 2 == 0) ? numBloquesDirectos / 8 : numBloquesDirectos / 8 + 1), bloque2(((numBloquesIndirectos1 / 8) % 2 == 0) ? numBloquesIndirectos1 / 8 : numBloquesIndirectos1 / 8 + 1), bloque3(((numeroBloquesIndirectos2 / 8) % 2 == 0) ? numeroBloquesIndirectos2 / 8 : numeroBloquesIndirectos2 / 8 + 1), bloque4(((numeroBloquesIndirectos3 / 8) % 2 == 0) ? numeroBloquesIndirectos3 / 8 : numeroBloquesIndirectos3 / 8 + 1)
@@ -250,7 +245,14 @@ MapaBits::MapaBits(int numBloquesDirectos, int numBloquesIndirectos1, int numero
 	ptrsCombinados[bloque1 + bloque2 + bloque3 + bloque4] = '\0';
 }
 
-void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
+MapaBits::MapaBits()
+{
+	file = new DataFile("test.bin");
+
+	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
+}
+
+void MapaBits::leerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 {
 	int currentPosition = sizeof(Metadata);
 	file->open("r");
@@ -264,32 +266,25 @@ void MapaBits::LeerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 	currentPosition += sizeof(Metadata);
-	bool Founded = false;
+	bool Found= false;
 
 	while (!file->isEOF()) {
 
 
 		toFind->imprimirMapaBits();
-		Founded = true;
+		Found = true;
 		break;
 		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 		currentPosition += toFind->getSizeOf();
 	}
 
-	if (!Founded) {
+	if (!Found) {
 		cout << "Employee not found" << endl;
 	}
 	file->close();
 }
 
-MapaBits::MapaBits() 
-{
-	file = new DataFile("test.bin");
-
-	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
-}
-
-void MapaBits::GuardarMapaBits()
+void MapaBits::establecerMapaBits()
 {
 	file->open("w");
 
@@ -297,16 +292,6 @@ void MapaBits::GuardarMapaBits()
 
 	file->write(newone->toChar(), sizeof(Metadata), newone->getSizeOf());
 	file->close();
-}
-
-void MapaBits::imprimirMapaBits()
-{
-	cout << ptrsCombinados << endl;
-}
-
-int MapaBits::getSizeOf()
-{
-	return (bloque1 + bloque2 + bloque3 + bloque4);
 }
 
 char* MapaBits::toChar()
@@ -318,4 +303,9 @@ void MapaBits::fromChar(char* _ptrsCombinados)
 {
 	ptrsCombinados = _ptrsCombinados;
 	ptrsCombinados[getSizeOf()] = '\0';
+}
+
+int MapaBits::getSizeOf()
+{
+	return (bloque1 + bloque2 + bloque3 + bloque4);
 }
