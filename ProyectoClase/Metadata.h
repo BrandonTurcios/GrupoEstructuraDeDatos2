@@ -98,6 +98,7 @@ public:
 	void fromChar(char*);
 	void establecerMapaBits();
 	void leerMapaBits(int, int, int, int);
+	void printMapa();
 
 };
 

@@ -69,7 +69,7 @@ void Metadata::guardarDisco()
 void Metadata::guardarMapaBits()
 {
 	MapaBits* mapa = new MapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
-	mapa->guardarMapaBits();
+	mapa->establecerMapaBits();
 }
 
 int Metadata::getSizeOf()
@@ -271,7 +271,7 @@ void MapaBits::leerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 	while (!file->isEOF()) {
 
 
-		toFind->imprimirMapaBits();
+		toFind->printMapa();
 		Found = true;
 		break;
 		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
@@ -282,6 +282,11 @@ void MapaBits::leerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
 		cout << "Employee not found" << endl;
 	}
 	file->close();
+}
+
+void MapaBits::printMapa()
+{
+	cout << "Mapa { " << ptrsCombinados << "}"<<endl;
 }
 
 void MapaBits::establecerMapaBits()
