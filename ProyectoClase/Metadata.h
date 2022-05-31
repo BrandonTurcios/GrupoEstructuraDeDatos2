@@ -91,13 +91,13 @@ private:
 
 public:
 	
-	MapaBits(int, int, int, int);
-	MapaBits();
+	MapaBits(char[],int, int, int, int);
+	MapaBits(char[]);
 	int getSizeOf();
 	char* toChar();
 	void fromChar(char*);
 	void establecerMapaBits();
-	void leerMapaBits(int, int, int, int);
+	void leerMapaBits(char[],int, int, int, int);
 	void printMapa();
 
 };

@@ -224,9 +224,9 @@ char* MapaBits::MapaBits_BI3::toChar()
 
 //----------------------------------------------------------------------
 
-MapaBits::MapaBits(int numBloquesDirectos, int numBloquesIndirectos1, int numeroBloquesIndirectos2, int numeroBloquesIndirectos3) : bloque1(((numBloquesDirectos / 8) % 2 == 0) ? numBloquesDirectos / 8 : numBloquesDirectos / 8 + 1), bloque2(((numBloquesIndirectos1 / 8) % 2 == 0) ? numBloquesIndirectos1 / 8 : numBloquesIndirectos1 / 8 + 1), bloque3(((numeroBloquesIndirectos2 / 8) % 2 == 0) ? numeroBloquesIndirectos2 / 8 : numeroBloquesIndirectos2 / 8 + 1), bloque4(((numeroBloquesIndirectos3 / 8) % 2 == 0) ? numeroBloquesIndirectos3 / 8 : numeroBloquesIndirectos3 / 8 + 1)
+MapaBits::MapaBits(char nombre[20],int numBloquesDirectos, int numBloquesIndirectos1, int numeroBloquesIndirectos2, int numeroBloquesIndirectos3) : bloque1(((numBloquesDirectos / 8) % 2 == 0) ? numBloquesDirectos / 8 : numBloquesDirectos / 8 + 1), bloque2(((numBloquesIndirectos1 / 8) % 2 == 0) ? numBloquesIndirectos1 / 8 : numBloquesIndirectos1 / 8 + 1), bloque3(((numeroBloquesIndirectos2 / 8) % 2 == 0) ? numeroBloquesIndirectos2 / 8 : numeroBloquesIndirectos2 / 8 + 1), bloque4(((numeroBloquesIndirectos3 / 8) % 2 == 0) ? numeroBloquesIndirectos3 / 8 : numeroBloquesIndirectos3 / 8 + 1)
 {
-	file = new DataFile("test.bin");
+	file = new DataFile(nombre);
 
 	MapaBits_BD* bloqueDirecto = new MapaBits_BD(bloque1);
 	MapaBits_BI1* bloqueI1 = new MapaBits_BI1(bloque2);
@@ -245,19 +245,19 @@ MapaBits::MapaBits(int numBloquesDirectos, int numBloquesIndirectos1, int numero
 	ptrsCombinados[bloque1 + bloque2 + bloque3 + bloque4] = '\0';
 }
 
-MapaBits::MapaBits()
+MapaBits::MapaBits(char nombre[20])
 {
-	file = new DataFile("test.bin");
+	file = new DataFile(nombre);
 
 	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
 }
 
-void MapaBits::leerMapaBits(int MBD, int MBI1, int MBI2, int MBI3)
+void MapaBits::leerMapaBits(char nombre[20],int MBD, int MBI1, int MBI2, int MBI3)
 {
 	int currentPosition = sizeof(Metadata);
 	file->open("r");
 
-	MapaBits* toFind = new MapaBits();
+	MapaBits* toFind = new MapaBits(nombre);
 
 	toFind->bloque1 = (((MBD / 8) % 2 == 0) ? MBD / 8 : MBD / 8 + 1);
 	toFind->bloque2 = (((MBI1 / 8) % 2 == 0) ? MBI1 / 8 : MBI1 / 8 + 1);
