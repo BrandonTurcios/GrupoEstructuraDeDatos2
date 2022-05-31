@@ -68,7 +68,7 @@ void Metadata::guardarDisco()
 
 void Metadata::guardarMapaBits()
 {
-	MapaBits* mapa = new MapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	MapaBits* mapa = new MapaBits(nombre[20],cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
 	mapa->establecerMapaBits();
 }
 
@@ -103,7 +103,7 @@ void Metadata::read(const char* _nombre)
 		cout << "Not found";
 
 	MapaBits* mapa = new MapaBits();
-	mapa->leerMapaBits(cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	mapa->leerMapaBits(nombre[20],cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
 
 	file->close();
 }
@@ -293,7 +293,7 @@ void MapaBits::establecerMapaBits()
 {
 	file->open("w");
 
-	MapaBits* newone = new MapaBits(bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
+	MapaBits* newone = new MapaBits(nombre[20],bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
 
 	file->write(newone->toChar(), sizeof(Metadata), newone->getSizeOf());
 	file->close();
