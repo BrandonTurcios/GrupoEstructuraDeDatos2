@@ -290,7 +290,7 @@ void MapaBits::printMapa()
 }
 
 void MapaBits::establecerMapaBits()
-{
+{ 
 	file->open("w");
 
 	MapaBits* newone = new MapaBits(nombre[20],bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
