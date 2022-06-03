@@ -105,6 +105,8 @@ public:
 class EntradasDirectorio
 {
 private:
+
+	EntradasDirectorio();
 	struct Entrada
 	{
 		char nombreEntrada[30];
@@ -123,9 +125,11 @@ private:
 
 
 	};
-
+public:
+	char* toChar();
+	void fromChar(char*);
 	//Entrada* lista;
-	EntradasDirectorio();
+	
 		//comentado porque da error
 		// lista = new Entrada[md.cantidadEntradasDirectorio];
 	
