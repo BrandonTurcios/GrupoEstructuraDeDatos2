@@ -124,12 +124,11 @@ private:
 
 	};
 
-	Entrada* lista;
-	EntradasDirectorio()
-	{
+	//Entrada* lista;
+	EntradasDirectorio();
 		//comentado porque da error
 		// lista = new Entrada[md.cantidadEntradasDirectorio];
-	}
+	
 
 	/*void write()
 	{
