@@ -46,8 +46,6 @@ private:
 	int bloque3;
 	int bloque4;
 
-
-
 	class MapaBits_BD
 	{
 	public:
@@ -96,7 +94,7 @@ public:
 	int getSizeOf();
 	char* toChar();
 	void fromChar(char*);
-	void establecerMapaBits();
+	void establecerMapaBits(char[]);
 	void leerMapaBits(char[],int, int, int, int);
 	void printMapa();
 

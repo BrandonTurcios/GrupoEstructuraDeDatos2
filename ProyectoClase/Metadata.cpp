@@ -3,7 +3,7 @@
 
 Metadata::Metadata(const char nombre[], int entradas): cantidadEntradasDirectorio(entradas),tamanoBloque(4096),cantidadBloquesDirectos(33308*entradas),cantidadBloquesInd1Nivel(2081 *entradas),cantidadBloquesInd2Nivel(65*entradas),cantidadBloquesInd3Nivel(entradas)
 {
-		abrirDisco("test.bin");
+		abrirDisco(nombre);
 		const char* fecha;
 		std::string fecha_;
 		time_t rawtime;
@@ -51,7 +51,7 @@ void Metadata::fromChar(char* readChar)
 	memcpy(&cantidadBloquesInd3Nivel, &readChar[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd2Nivel)], sizeof(cantidadBloquesInd3Nivel));
 }
 
-void Metadata::abrirDisco(const char nombre[13])
+void Metadata::abrirDisco(const char nombre[20])
 {
 	file = new DataFile(nombre);
 	
@@ -68,8 +68,8 @@ void Metadata::guardarDisco()
 
 void Metadata::guardarMapaBits()
 {
-	MapaBits* mapa = new MapaBits(nombre[20],cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
-	mapa->establecerMapaBits();
+	MapaBits* mapa = new MapaBits(nombreDisco,cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	mapa->establecerMapaBits(nombreDisco);
 }
 
 int Metadata::getSizeOf()
@@ -102,15 +102,15 @@ void Metadata::read(const char* _nombre)
 	if (!found)
 		cout << "Not found";
 
-	MapaBits* mapa = new MapaBits();
-	mapa->leerMapaBits(nombre[20],cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	MapaBits* mapa = new MapaBits(nombreDisco);
+	mapa->leerMapaBits(nombreDisco,cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
 
 	file->close();
 }
 
 void Metadata::print()
 {
-	cout << "Metada{ nombre:" << nombreDisco << ", fecha:" << fechaCreacion << " cantidad:" << cantidadEntradasDirectorio << " tamano:" << tamanoBloque << " bloqueD:" << cantidadBloquesDirectos << " bloqueI1:" << cantidadBloquesInd1Nivel << " bloqueI2:" << cantidadBloquesInd2Nivel << " bloqueI3:" << cantidadBloquesInd3Nivel << "}\n";
+	cout << "Metadata{ nombre:" << nombreDisco << ", fecha:" << fechaCreacion << " cantidad:" << cantidadEntradasDirectorio << " tamano:" << tamanoBloque << " bloqueD:" << cantidadBloquesDirectos << " bloqueI1:" << cantidadBloquesInd1Nivel << " bloqueI2:" << cantidadBloquesInd2Nivel << " bloqueI3:" << cantidadBloquesInd3Nivel << "}\n";
 }
 
 const char* Metadata::getNombre()
@@ -289,11 +289,11 @@ void MapaBits::printMapa()
 	cout << "Mapa { " << ptrsCombinados << "}"<<endl;
 }
 
-void MapaBits::establecerMapaBits()
+void MapaBits::establecerMapaBits(char nombre[20])
 { 
 	file->open("w");
 
-	MapaBits* newone = new MapaBits(nombre[20],bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
+	MapaBits* newone = new MapaBits(nombre,bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
 
 	file->write(newone->toChar(), sizeof(Metadata), newone->getSizeOf());
 	file->close();

@@ -30,10 +30,9 @@ int main()
 			cin >> comandoUnico>>nombre>>cantidad;
 			cout << comandoUnico << endl << nombre << endl<< cantidad << endl;
 			Metadata test(nombre.c_str(), cantidad);
-			test.abrirDisco(nombre.c_str());
 			test.guardarDisco();
 			test.guardarMapaBits();
-			test.read("test.bin");
+			test.read(nombre.c_str());
 		}
 		else if (opcion == 2)
 		{
