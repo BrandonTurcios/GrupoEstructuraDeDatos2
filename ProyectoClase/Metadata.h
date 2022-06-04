@@ -105,29 +105,30 @@ public:
 class EntradasDirectorio
 {
 private:
-
+	DataFile* file;
 	EntradasDirectorio();
 	struct Entrada
 	{
+		
 		char nombreEntrada[30];
 		bool esArchivo; // 1->File, 0->Folder
 		unsigned int tamanio;
 
-		/////////////////////////////////////////////////////////////////////////////
 		short int indPadre;
 		short int indPrimerHijo;
 		short int indHermanoDerecho;
+
 
 		char fechaCreacion[8]; //ddMMyyyy
 		//punterosabloques de datos (Importacion de archivos)
 		unsigned int ptrsBD[12];
 		unsigned int ptrsBDI[3]; //[0] -> BI1, [1] -> BI2, [2] -> BI3
-
-
+		Entrada* listaEntradas[];
 	};
 public:
 	char* toChar();
 	void fromChar(char*);
+	void setMkdir(char, long, char, char);
 	//Entrada* lista;
 	
 		//comentado porque da error
