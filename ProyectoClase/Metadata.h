@@ -160,7 +160,7 @@ class BloqueInd1Nivel : public tipoBloque
 private:
 	unsigned int ptrs[16]; // [0]
 };
-
+//
 class BloqueInd2Nivel : public tipoBloque
 {
 private:
