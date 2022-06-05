@@ -106,6 +106,7 @@ class EntradasDirectorio
 {
 private:
 	DataFile* file;
+	Metadata cantidadEntradasDirectorio;
 	EntradasDirectorio();
 	struct Entrada
 	{
