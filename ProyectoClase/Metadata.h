@@ -106,11 +106,10 @@ class EntradasDirectorio
 {
 private:
 	DataFile* file;
-	Metadata cantidadEntradasDirectorio;
-	EntradasDirectorio();
+	int nEntradasDirectorio;
+
 	struct Entrada
 	{
-		
 		char nombreEntrada[30];
 		bool esArchivo; // 1->File, 0->Folder
 		unsigned int tamanio;
@@ -124,12 +123,19 @@ private:
 		//punterosabloques de datos (Importacion de archivos)
 		unsigned int ptrsBD[12];
 		unsigned int ptrsBDI[3]; //[0] -> BI1, [1] -> BI2, [2] -> BI3
-		Entrada* listaEntradas[];
+		
+		
 	};
+	
 public:
+	Entrada* listaEntradas;
+	EntradasDirectorio(char[20], int);
+	void print();
+	int getSizeOf();
+	
 	char* toChar();
 	void fromChar(char*);
-	void setMkdir(char, long, char, char);
+	void setMkdir(char[20], long, char[30], char[30]);
 	//Entrada* lista;
 	
 		//comentado porque da error

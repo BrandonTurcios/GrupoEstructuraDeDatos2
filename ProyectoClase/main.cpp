@@ -17,7 +17,7 @@ int main()
 	int opcion;
 	do {
 		printf("1- Crear disco\n");
-		printf("2- Mostrar Disco\n");
+		printf("2- Mkdir\n");
 		printf("3- ------------- \n");
 		printf("4- ------------- \n");
 		printf("5- Salir\n");

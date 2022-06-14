@@ -1,6 +1,5 @@
 #include "Metadata.h"
 
-
 Metadata::Metadata(const char nombre[], int entradas): cantidadEntradasDirectorio(entradas),tamanoBloque(4096),cantidadBloquesDirectos(33308*entradas),cantidadBloquesInd1Nivel(2081 *entradas),cantidadBloquesInd2Nivel(65*entradas),cantidadBloquesInd3Nivel(entradas)
 {
 		abrirDisco(nombre);
@@ -64,6 +63,8 @@ void Metadata::guardarDisco()
 	Metadata* newone = new Metadata(nombreDisco,cantidadEntradasDirectorio);
 	file->write(newone->toChar(), 0, newone->getSizeOf());
 	file->close();
+
+	EntradasDirectorio* entradas = new EntradasDirectorio(nombreDisco, cantidadEntradasDirectorio);
 }
 
 void Metadata::guardarMapaBits()
@@ -119,6 +120,7 @@ const char* Metadata::getNombre()
 }
 
 //--------------------------------------------------------------------------------------------
+
 MapaBits::MapaBits_BD::MapaBits_BD()
 {
 }
@@ -147,6 +149,7 @@ char* MapaBits::MapaBits_BD::toChar()
 }
 
 // -----------------------------------------------------------------
+
 MapaBits::MapaBits_BI1::MapaBits_BI1()
 {
 }
@@ -172,6 +175,7 @@ char* MapaBits::MapaBits_BI1::toChar()
 }
 
 //------------------------------------------------------------------
+
 MapaBits::MapaBits_BI2::MapaBits_BI2()
 {
 }
@@ -296,6 +300,7 @@ void MapaBits::establecerMapaBits(char nombre[20])
 	MapaBits* newone = new MapaBits(nombre,bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
 
 	file->write(newone->toChar(), sizeof(Metadata), newone->getSizeOf());
+
 	file->close();
 }
 
@@ -317,18 +322,71 @@ int MapaBits::getSizeOf()
 
 //----------------------------------------------------------------------------
 
-EntradasDirectorio::EntradasDirectorio()
+EntradasDirectorio::EntradasDirectorio(char nombre[20],int _cantidadEntradas):nEntradasDirectorio(_cantidadEntradas)
 {
+	file = new DataFile(nombre);
+	//listaEntradas = new Entrada[2];
+	listaEntradas = new Entrada[nEntradasDirectorio];
+	Entrada Temporal = Entrada();
 
+	for (int i = 0; i < nEntradasDirectorio; i++) 
+	{
+		listaEntradas[i] = Temporal;
+	}
+
+	for (int i = 0; i < nEntradasDirectorio; i++) 
+	{
+		memcpy(listaEntradas[i].nombreEntrada, "undefined", strlen("undefined") + 1);
+
+		listaEntradas[i].esArchivo = false;
+		listaEntradas[i].tamanio = 0;
+
+		listaEntradas[i].indPadre = -1;
+		listaEntradas[i].indPrimerHijo = -1;
+		listaEntradas[i].indHermanoDerecho = -1;
+
+		memcpy(listaEntradas[i].fechaCreacion, "0000000", strlen("0000000") + 1);
+
+
+
+		for (int j = 0; j < 12; j++) {
+			listaEntradas[i].ptrsBD[j] = 0;
+			if (j <= 3) {
+				listaEntradas[i].ptrsBDI[j] = 0;
+			}
+		}
+
+	}
+}
+
+void EntradasDirectorio::print()
+{
+	for (int i = 0; i < nEntradasDirectorio; i++) 
+	{
+		cout << "Nombre: " << listaEntradas[i].nombreEntrada << endl;
+		cout << "EsArchivo: " << listaEntradas[i].esArchivo << endl;
+		cout << "Tamanio: " << listaEntradas[i].tamanio << endl;
+		cout << "FechaCreacion: " << listaEntradas[i].fechaCreacion << endl;
+		cout << "IndPadre: " << listaEntradas[i].indPadre << endl;
+		cout << "IndHijo: " << listaEntradas[i].indPrimerHijo << endl;
+		cout << "IndHermanoDerecho: " << listaEntradas[i].indHermanoDerecho << endl;
+
+
+	}
+}
+
+int EntradasDirectorio::getSizeOf()
+{
+	return 70* nEntradasDirectorio;
 }
 
 char* EntradasDirectorio::toChar()
 {
-	char* charResult = new char[112 * cantidadEntradasDirectorio];
+	char* charResult = new char[112* nEntradasDirectorio];
 
 	long pointer = 0;
 
-	for (int i = 0; i < cantidadEntradasDirectorio; i++) {
+	for (int i = 0; i < nEntradasDirectorio; i++) {
 
 		memcpy(&charResult[pointer], listaEntradas[i].nombreEntrada, sizeof(listaEntradas[i].nombreEntrada));
 		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada)], &listaEntradas[i].esArchivo, sizeof(listaEntradas[i].esArchivo));
@@ -348,10 +406,9 @@ char* EntradasDirectorio::toChar()
 
 void EntradasDirectorio::fromChar(char*charRead)
 {
-
 	long pointer = 0;
 
-	for (int i = 0; i < cantidadEntradasDirectorio; i++) {
+	for (int i = 0; i < nEntradasDirectorio; i++) {
 		memcpy(listaEntradas[i].nombreEntrada, &charRead[pointer], sizeof(listaEntradas[i].nombreEntrada));
 		memcpy(&listaEntradas[i].esArchivo, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada)], sizeof(listaEntradas[i].esArchivo));
 		memcpy(&listaEntradas[i].tamanio, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo)], sizeof(listaEntradas[i].tamanio));
@@ -371,16 +428,10 @@ void EntradasDirectorio::fromChar(char*charRead)
 void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDirect[30], char DirectorioActual[30])
 {
 
-
 	int currentPosition = sizeof(Metadata) + MapaBits;
-
-	cout << "Tamaños: META: " << sizeof(Metadata) << " MAPABITS: " << MapaBits << endl;
-
 	file->open("rw");
 
-	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, cantidadEntradasDirectorio);
-	cout << "EntradasDirectorio C SizeOF: " << toFind->getSizeOf() << endl;
-
+	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 	currentPosition += sizeof(EntradasDirectorio);
 
@@ -390,7 +441,7 @@ void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDire
 
 	while (!file->isEOF()) {
 
-		for (int i = 0; i < cantidadEntradasDirectorio; i++) {
+		for (int i = 0; i < nEntradasDirectorio; i++) {
 
 			if (strcmp(toFind->listaEntradas[i].nombreEntrada, "Indefinido") == 0) {
 				memcpy(toFind->listaEntradas[i].nombreEntrada, NuevoDirect, strlen(NuevoDirect) + 1);
@@ -421,20 +472,12 @@ void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDire
 				TempindHermanoIzquierdo = i;
 			}
 
-
 		}
 
 		toFind->print();
-
-
-
 		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 		currentPosition += sizeof(EntradasDirectorio);
-
-
 	}
-
-
 
 	file->close();
 }
