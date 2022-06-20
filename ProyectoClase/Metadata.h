@@ -128,7 +128,7 @@ private:
 	};
 	
 public:
-	Entrada* listaEntradas;
+	Entrada* entryLists;
 	EntradasDirectorio(char[20], int);
 	void print();
 	int getSizeOf();

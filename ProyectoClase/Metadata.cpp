@@ -322,37 +322,37 @@ int MapaBits::getSizeOf()
 
 //----------------------------------------------------------------------------
 
-EntradasDirectorio::EntradasDirectorio(char nombre[20],int _cantidadEntradas):nEntradasDirectorio(_cantidadEntradas)
+EntradasDirectorio::EntradasDirectorio(char newName[20],int _cantidadEntradas):nEntradasDirectorio(_cantidadEntradas)
 {
-	file = new DataFile(nombre);
-	//listaEntradas = new Entrada[2];
-	listaEntradas = new Entrada[nEntradasDirectorio];
+	file = new DataFile(newName);
+	
+	entryLists = new Entrada[nEntradasDirectorio];
 	Entrada Temporal = Entrada();
 
 	for (int i = 0; i < nEntradasDirectorio; i++) 
 	{
-		listaEntradas[i] = Temporal;
+		entryLists[i] = Temporal;
 	}
 
 	for (int i = 0; i < nEntradasDirectorio; i++) 
 	{
-		memcpy(listaEntradas[i].nombreEntrada, "undefined", strlen("undefined") + 1);
+		memcpy(entryLists[i].nombreEntrada, "undefined", strlen("undefined") + 1);
 
-		listaEntradas[i].esArchivo = false;
-		listaEntradas[i].tamanio = 0;
+		entryLists[i].esArchivo = false;
+		entryLists[i].tamanio = 0;
 
-		listaEntradas[i].indPadre = -1;
-		listaEntradas[i].indPrimerHijo = -1;
-		listaEntradas[i].indHermanoDerecho = -1;
+		entryLists[i].indPadre = -1;
+		entryLists[i].indPrimerHijo = -1;
+		entryLists[i].indHermanoDerecho = -1;
 
-		memcpy(listaEntradas[i].fechaCreacion, "0000000", strlen("0000000") + 1);
+		memcpy(entryLists[i].fechaCreacion, "0000000", strlen("0000000") + 1);
 
 
 
 		for (int j = 0; j < 12; j++) {
-			listaEntradas[i].ptrsBD[j] = 0;
+			entryLists[i].ptrsBD[j] = 0;
 			if (j <= 3) {
-				listaEntradas[i].ptrsBDI[j] = 0;
+				entryLists[i].ptrsBDI[j] = 0;
 			}
 		}
 
@@ -363,13 +363,13 @@ void EntradasDirectorio::print()
 {
 	for (int i = 0; i < nEntradasDirectorio; i++) 
 	{
-		cout << "Nombre: " << listaEntradas[i].nombreEntrada << endl;
-		cout << "EsArchivo: " << listaEntradas[i].esArchivo << endl;
-		cout << "Tamanio: " << listaEntradas[i].tamanio << endl;
-		cout << "FechaCreacion: " << listaEntradas[i].fechaCreacion << endl;
-		cout << "IndPadre: " << listaEntradas[i].indPadre << endl;
-		cout << "IndHijo: " << listaEntradas[i].indPrimerHijo << endl;
-		cout << "IndHermanoDerecho: " << listaEntradas[i].indHermanoDerecho << endl;
+		cout << "Nombre: " << entryLists[i].nombreEntrada << endl;
+		cout << "EsArchivo: " << entryLists[i].esArchivo << endl;
+		cout << "Tamanio: " << entryLists[i].tamanio << endl;
+		cout << "FechaCreacion: " << entryLists[i].fechaCreacion << endl;
+		cout << "IndPadre: " << entryLists[i].indPadre << endl;
+		cout << "IndHijo: " << entryLists[i].indPrimerHijo << endl;
+		cout << "IndHermanoDerecho: " << entryLists[i].indHermanoDerecho << endl;
 
 
 	}
@@ -388,17 +388,17 @@ char* EntradasDirectorio::toChar()
 
 	for (int i = 0; i < nEntradasDirectorio; i++) {
 
-		memcpy(&charResult[pointer], listaEntradas[i].nombreEntrada, sizeof(listaEntradas[i].nombreEntrada));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada)], &listaEntradas[i].esArchivo, sizeof(listaEntradas[i].esArchivo));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo)], &listaEntradas[i].tamanio, sizeof(listaEntradas[i].tamanio));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio)], &listaEntradas[i].indPadre, sizeof(listaEntradas[i].indPadre));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre)], &listaEntradas[i].indPrimerHijo, sizeof(listaEntradas[i].indPrimerHijo));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo)], &listaEntradas[i].indHermanoDerecho, sizeof(listaEntradas[i].indHermanoDerecho));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho)], listaEntradas[i].fechaCreacion, sizeof(listaEntradas[i].fechaCreacion));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho) + sizeof(listaEntradas[i].fechaCreacion)], listaEntradas[i].ptrsBD, sizeof(listaEntradas[i].ptrsBD));
-		memcpy(&charResult[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho) + sizeof(listaEntradas[i].fechaCreacion) + sizeof(listaEntradas[i].ptrsBD)], listaEntradas[i].ptrsBDI, sizeof(listaEntradas[i].ptrsBDI));
+		memcpy(&charResult[pointer], entryLists[i].nombreEntrada, sizeof(entryLists[i].nombreEntrada));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada)], &entryLists[i].esArchivo, sizeof(entryLists[i].esArchivo));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo)], &entryLists[i].tamanio, sizeof(entryLists[i].tamanio));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio)], &entryLists[i].indPadre, sizeof(entryLists[i].indPadre));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre)], &entryLists[i].indPrimerHijo, sizeof(entryLists[i].indPrimerHijo));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo)], &entryLists[i].indHermanoDerecho, sizeof(entryLists[i].indHermanoDerecho));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho)], entryLists[i].fechaCreacion, sizeof(entryLists[i].fechaCreacion));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho) + sizeof(entryLists[i].fechaCreacion)], entryLists[i].ptrsBD, sizeof(entryLists[i].ptrsBD));
+		memcpy(&charResult[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho) + sizeof(entryLists[i].fechaCreacion) + sizeof(entryLists[i].ptrsBD)], entryLists[i].ptrsBDI, sizeof(entryLists[i].ptrsBDI));
 
-		pointer += sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho) + sizeof(listaEntradas[i].fechaCreacion) + sizeof(listaEntradas[i].fechaCreacion) + sizeof(listaEntradas[i].ptrsBDI);
+		pointer += sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho) + sizeof(entryLists[i].fechaCreacion) + sizeof(entryLists[i].fechaCreacion) + sizeof(entryLists[i].ptrsBDI);
 	}
 	return charResult;
 
@@ -409,52 +409,52 @@ void EntradasDirectorio::fromChar(char*charRead)
 	long pointer = 0;
 
 	for (int i = 0; i < nEntradasDirectorio; i++) {
-		memcpy(listaEntradas[i].nombreEntrada, &charRead[pointer], sizeof(listaEntradas[i].nombreEntrada));
-		memcpy(&listaEntradas[i].esArchivo, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada)], sizeof(listaEntradas[i].esArchivo));
-		memcpy(&listaEntradas[i].tamanio, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo)], sizeof(listaEntradas[i].tamanio));
-		memcpy(&listaEntradas[i].indPadre, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio)], sizeof(listaEntradas[i].indPadre));
-		memcpy(&listaEntradas[i].indPrimerHijo, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre)], sizeof(listaEntradas[i].indPrimerHijo));
-		memcpy(&listaEntradas[i].indHermanoDerecho, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo)], sizeof(listaEntradas[i].indHermanoDerecho));
-		memcpy(listaEntradas[i].fechaCreacion, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho)], sizeof(listaEntradas[i].fechaCreacion));
-		memcpy(listaEntradas[i].ptrsBD, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho) + sizeof(listaEntradas[i].fechaCreacion)], sizeof(listaEntradas[i].ptrsBD));
-		memcpy(listaEntradas[i].ptrsBDI, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho) + sizeof(listaEntradas[i].fechaCreacion) + sizeof(listaEntradas[i].ptrsBD)], sizeof(listaEntradas[i].ptrsBDI));
-		pointer += sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo) + sizeof(listaEntradas[i].tamanio) + sizeof(listaEntradas[i].indPadre) + sizeof(listaEntradas[i].indPrimerHijo) + sizeof(listaEntradas[i].indHermanoDerecho) + sizeof(listaEntradas[i].fechaCreacion) + sizeof(listaEntradas[i].fechaCreacion) + sizeof(listaEntradas[i].ptrsBDI);
+		memcpy(entryLists[i].nombreEntrada, &charRead[pointer], sizeof(entryLists[i].nombreEntrada));
+		memcpy(&entryLists[i].esArchivo, &charRead[pointer + sizeof(entryLists[i].nombreEntrada)], sizeof(entryLists[i].esArchivo));
+		memcpy(&entryLists[i].tamanio, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo)], sizeof(entryLists[i].tamanio));
+		memcpy(&entryLists[i].indPadre, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio)], sizeof(entryLists[i].indPadre));
+		memcpy(&entryLists[i].indPrimerHijo, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre)], sizeof(entryLists[i].indPrimerHijo));
+		memcpy(&entryLists[i].indHermanoDerecho, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo)], sizeof(entryLists[i].indHermanoDerecho));
+		memcpy(entryLists[i].fechaCreacion, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho)], sizeof(entryLists[i].fechaCreacion));
+		memcpy(entryLists[i].ptrsBD, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho) + sizeof(entryLists[i].fechaCreacion)], sizeof(entryLists[i].ptrsBD));
+		memcpy(entryLists[i].ptrsBDI, &charRead[pointer + sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho) + sizeof(entryLists[i].fechaCreacion) + sizeof(entryLists[i].ptrsBD)], sizeof(entryLists[i].ptrsBDI));
+		pointer += sizeof(entryLists[i].nombreEntrada) + sizeof(entryLists[i].esArchivo) + sizeof(entryLists[i].tamanio) + sizeof(entryLists[i].indPadre) + sizeof(entryLists[i].indPrimerHijo) + sizeof(entryLists[i].indHermanoDerecho) + sizeof(entryLists[i].fechaCreacion) + sizeof(entryLists[i].fechaCreacion) + sizeof(entryLists[i].ptrsBDI);
 
 
 	}
 
 }
 
-void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDirect[30], char DirectorioActual[30])
+void EntradasDirectorio::setMkdir(char name[20], long bitsMap, char newDirectory[30], char currentDirectory[30])
 {
 
-	int currentPosition = sizeof(Metadata) + MapaBits;
+	int currentPosition = sizeof(Metadata) + bitsMap;
 	file->open("rw");
 
-	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
+	EntradasDirectorio* toFind = new EntradasDirectorio(name, nEntradasDirectorio);
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 	currentPosition += sizeof(EntradasDirectorio);
 
-	short int TempindPadre = -1;
-	short int TempindPrimerHijo = -1;
-	short int TempindHermanoIzquierdo = -1;
+	short int temporalIndirectFather = -1;
+	short int temIndirectSon = -1;
+	short int tempLeftBrother = -1;
 
 	while (!file->isEOF()) {
 
 		for (int i = 0; i < nEntradasDirectorio; i++) {
 
-			if (strcmp(toFind->listaEntradas[i].nombreEntrada, "Indefinido") == 0) {
-				memcpy(toFind->listaEntradas[i].nombreEntrada, NuevoDirect, strlen(NuevoDirect) + 1);
+			if (strcmp(toFind->entryLists[i].nombreEntrada, "Indefinido") == 0) {
+				memcpy(toFind->entryLists[i].nombreEntrada, newDirectory, strlen(newDirectory) + 1);
 
-				toFind->listaEntradas[i].indPadre = TempindPadre;
-				toFind->listaEntradas[i].indPrimerHijo = TempindPrimerHijo;
-				toFind->listaEntradas[TempindHermanoIzquierdo].indHermanoDerecho = i;
+				toFind->entryLists[i].indPadre = temporalIndirectFather;
+				toFind->entryLists[i].indPrimerHijo = temIndirectSon;
+				toFind->entryLists[tempLeftBrother].indHermanoDerecho = i;
 
-				if (TempindPadre >= 0 && toFind->listaEntradas[TempindPadre].indPrimerHijo == -1) {
-					toFind->listaEntradas[TempindPadre].indPrimerHijo = i;
+				if (temporalIndirectFather >= 0 && toFind->entryLists[temporalIndirectFather].indPrimerHijo == -1) {
+					toFind->entryLists[temporalIndirectFather].indPrimerHijo = i;
 				}
 
-				file->write(toFind->toChar(), sizeof(Metadata) + MapaBits, toFind->getSizeOf());
+				file->write(toFind->toChar(), sizeof(Metadata) + bitsMap, toFind->getSizeOf());
 
 
 				file->close();
@@ -462,14 +462,14 @@ void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDire
 				return;
 
 			}
-			else if (strcmp(toFind->listaEntradas[i].nombreEntrada, DirectorioActual) == 0) {
+			else if (strcmp(toFind->entryLists[i].nombreEntrada, currentDirectory) == 0) {
 
-				TempindPadre = i;
+				temporalIndirectFather = i;
 			}
-			else if ((strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, DirectorioActual) == 0) && toFind->listaEntradas[i].indHermanoDerecho == -1) {
+			else if ((strcmp(toFind->entryLists[toFind->entryLists[i].indPadre].nombreEntrada, currentDirectory) == 0) && toFind->entryLists[i].indHermanoDerecho == -1) {
 
 
-				TempindHermanoIzquierdo = i;
+				tempLeftBrother = i;
 			}
 
 		}
