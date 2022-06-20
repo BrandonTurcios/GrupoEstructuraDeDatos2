@@ -320,7 +320,9 @@ int MapaBits::getSizeOf()
 	return (bloque1 + bloque2 + bloque3 + bloque4);
 }
 
-//----------------------------------------------------------------------------
+//---------------------------------------------------------------------------- 
+
+//
 
 EntradasDirectorio::EntradasDirectorio(char newName[20],int _cantidadEntradas):nEntradasDirectorio(_cantidadEntradas)
 {
