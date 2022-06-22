@@ -63,7 +63,7 @@ int main()
 		}
 		else if (strcmp(comando, "ls") == 0) {
 			if (strcmp(currentDirectorio, "undefined") == 0) {
-				std::cout << "ERROR Primero debe crear un directorio " << endl;
+				std::cout << "ERROR " << endl;
 			}
 			else {
 				EntradasDirectorio* temp = new EntradasDirectorio(nombreDisco, cantidadDirectorios);

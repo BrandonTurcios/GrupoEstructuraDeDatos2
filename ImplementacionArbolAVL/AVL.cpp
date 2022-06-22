@@ -277,6 +277,9 @@ int main()
     cout << endl << "-----INORDEN----------" << endl;
     imprimirInOrden(test);
 
+
+    cout << endl << "----eliminar 7----------" << endl;
+ 
     test = eliminarNodo(test, 7);
     cout << endl << "-----PREORDEN----------" << endl;
     imprimirPreOrden(test);
@@ -284,7 +287,18 @@ int main()
     imprimirPostOrden(test);
     cout << endl << "-----INORDEN----------" << endl;
     imprimirInOrden(test);
+
  
+    cout << endl << "----eliminar 15----------" << endl;
+
+    test = eliminarNodo(test, 15);
+    cout << endl << "-----PREORDEN----------" << endl;
+    imprimirPreOrden(test);
+    cout << endl << "-----POSTORDEN----------" << endl;
+    imprimirPostOrden(test);
+    cout << endl << "-----INORDEN----------" << endl;
+    imprimirInOrden(test);
+
 
     _getch();
 }
