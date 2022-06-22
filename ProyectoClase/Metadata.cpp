@@ -497,9 +497,8 @@ void EntradasDirectorio::read(char nombre[20], long mapaBits)
 {
 	file->open("r");
 	int currentPosition = sizeof(Metadata) + mapaBits;
-	//cout << "Tamaños: META: " << sizeof(Metadata) << " MAPABITS: " << mapaBits << endl;
+
 	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
-	//cout << "EntradasDirectorio C SizeOF: " << toFind->getSizeOf() << endl;
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 	toFind->print();
 	file->close();
