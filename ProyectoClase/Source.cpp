@@ -4,8 +4,8 @@ using namespace std;
 #include "Metadata.h"
 int main() 
 {
-	int opcion = 1, int cantidadDirectorios;
-	char tempDirectorio[30] = "undefined",char currentDirectorio[30] = "undefined",char direccion[20],char comando[20],char nombreDisco[20];
+	int opcion = 1; int cantidadDirectorios;
+	char tempDirectorio[30] = "undefined"; char currentDirectorio[30] = "undefined"; char direccion[20]; char comando[20]; char nombreDisco[20];
 	
 	std::cout << "$";
 	std::cin >> comando >> nombreDisco >> cantidadDirectorios;

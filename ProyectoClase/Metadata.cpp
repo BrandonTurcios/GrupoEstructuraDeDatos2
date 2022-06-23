@@ -427,36 +427,35 @@ void EntradasDirectorio::fromChar(char* charRead)
 
 }
 
-void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDirect[30], char DirectorioActual[30])
+void EntradasDirectorio::setMkdir(char nombre[20], long mapaBits, char directorio[30], char currentDirectorio[30])
 {
-
-	int currentPosition = sizeof(Metadata) + MapaBits;
 	file->open("rw");
-
+	int currentPosition = sizeof(Metadata) + mapaBits;
+	
 	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 	currentPosition += sizeof(EntradasDirectorio);
 
-	short int TempindPadre = -1;
-	short int TempindPrimerHijo = -1;
-	short int TempindHermanoIzquierdo = -1;
+	short int padreTemporal = -1;
+	short int primerHijoTemporal = -1;
+	short int hermanoIzquierdoTemp = -1;
 
 	while (!file->isEOF()) {
 
 		for (int i = 0; i < nEntradasDirectorio; i++) {
 
 			if (strcmp(toFind->listaEntradas[i].nombreEntrada, "Indefinido") == 0) {
-				memcpy(toFind->listaEntradas[i].nombreEntrada, NuevoDirect, strlen(NuevoDirect) + 1);
+				memcpy(toFind->listaEntradas[i].nombreEntrada, directorio, strlen(directorio) + 1);
 
-				toFind->listaEntradas[i].indPadre = TempindPadre;
-				toFind->listaEntradas[i].indPrimerHijo = TempindPrimerHijo;
-				toFind->listaEntradas[TempindHermanoIzquierdo].indHermanoDerecho = i;
+				toFind->listaEntradas[i].indPadre = padreTemporal;
+				toFind->listaEntradas[i].indPrimerHijo = primerHijoTemporal;
+				toFind->listaEntradas[hermanoIzquierdoTemp].indHermanoDerecho = i;
 
-				if (TempindPadre >= 0 && toFind->listaEntradas[TempindPadre].indPrimerHijo == -1) {
-					toFind->listaEntradas[TempindPadre].indPrimerHijo = i;
+				if (padreTemporal >= 0 && toFind->listaEntradas[padreTemporal].indPrimerHijo == -1) {
+					toFind->listaEntradas[padreTemporal].indPrimerHijo = i;
 				}
 
-				file->write(toFind->toChar(), sizeof(Metadata) + MapaBits, toFind->getSizeOf());
+				file->write(toFind->toChar(), sizeof(Metadata) + mapaBits, toFind->getSizeOf());
 
 
 				file->close();
@@ -464,14 +463,14 @@ void EntradasDirectorio::setMkdir(char nombre[20], long MapaBits, char NuevoDire
 				return;
 
 			}
-			else if (strcmp(toFind->listaEntradas[i].nombreEntrada, DirectorioActual) == 0) {
+			else if (strcmp(toFind->listaEntradas[i].nombreEntrada, currentDirectorio) == 0) {
 
-				TempindPadre = i;
+				padreTemporal = i;
 			}
-			else if ((strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, DirectorioActual) == 0) && toFind->listaEntradas[i].indHermanoDerecho == -1) {
+			else if ((strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, currentDirectorio) == 0) && toFind->listaEntradas[i].indHermanoDerecho == -1) {
 
 
-				TempindHermanoIzquierdo = i;
+				hermanoIzquierdoTemp = i;
 			}
 
 		}
