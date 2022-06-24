@@ -159,23 +159,24 @@ Nodo* eliminarNodo(Nodo* raiz, int valor)
     if (raiz == NULL)
         return raiz;
 
-    // If the valor to be deleted is smaller
-    // than the raiz's valor, then it lies
-    // in izquierda subtree
+    // Si el valor a borrar es menor
+    // que el valor de la raiz, entonces ir al  subárbol izquierdo
+
     if (valor < raiz->valor)
         raiz->izquierda = eliminarNodo(raiz->izquierda, valor);
 
-    // If the valor to be deleted is greater
-    // than the raiz's valor, then it lies
-    // in derecha subtree
+    // Si el valor a borrar es mayor
+    // que el valor de la raiz, entonces ir al
+    // subárbol derecho
+
     else if (valor > raiz->valor)
         raiz->derecha = eliminarNodo(raiz->derecha, valor);
 
-    // if valor is same as raiz's valor, then
-    // This is the node to be deleted
+    //si el valor es el mismo que el valor de raiz, entonces
+        // Este es el nodo a eliminar
     else
     {
-        // node with only one child or no child
+        // Nodo con solo un hijo o sin hijo
         if ((raiz->izquierda == NULL) ||
             (raiz->derecha == NULL))
         {
@@ -183,56 +184,57 @@ Nodo* eliminarNodo(Nodo* raiz, int valor)
                 raiz->izquierda :
                 raiz->derecha;
 
-            // No child case
+            // Caso sin hijo
             if (temp == NULL)
             {
                 temp = raiz;
                 raiz = NULL;
             }
-            else // One child case
-                *raiz = *temp; // Copy the contents of
-                               // the non-empty child
+            else // Caso con 1 hijo
+                *raiz = *temp; // Copiar el contenido de
+                               // el hijo que no está vacío
             free(temp);
         }
         else
         {
-            // node with two children: Get the inorder
-            // successor (smallest in the derecha subtree)
+            // nodo con dos hijos: Obtener el orden
+              // sucesor (el más pequeño en el subárbol de la derecha)
             Nodo* temp = nodoMenorValor(raiz->derecha);
 
-            // Copy the inorder successor's
-            // data to this node
+            // Copiar el sucesor en orden
+              // datos a este nodo
+
             raiz->valor = temp->valor;
 
-            // Delete the inorder successor
+            // Eliminar el sucesor  en Inorden
             raiz->derecha = eliminarNodo(raiz->derecha,
                 temp->valor);
         }
     }
 
-    // If the tree had only one node
-    // then return
+    // Si el árbol tuviera un solo nodo
+    //entonces return
     if (raiz == NULL)
         return raiz;
 
-    // STEP 2: UPDATE HEIGHT OF THE CURRENT NODE
+    // PASO 2: ACTUALIZAR LA ALTURA DEL NODO ACTUAL
     raiz->altura = 1 + max(getAltura(raiz->izquierda),
         getAltura(raiz->derecha));
 
-    // STEP 3: GET THE BALANCE FACTOR OF
-    // THIS NODE (to check whether this
-    // node became unbalanced)
+    // PASO 3: OBTENER EL FACTOR DE EQUILIBRIO DE
+     // ESTE NODO (para comprobar si este
+     // el nodo se desequilibró)
     int balance = getBalance(raiz);
 
-    // If this node becomes unbalanced,
-    // then there are 4 cases
+    // Si este nodo se desequilibra,
+     //entonces hay 4 casos
 
-    // izquierda izquierda Case
+    // izquierda izquierda 
     if (balance > 1 &&
         getBalance(raiz->izquierda) >= 0)
         return rotacionDerecha(raiz);
 
-    // izquierda derecha Case
+    // izquierda derecha
     if (balance > 1 &&
         getBalance(raiz->izquierda) < 0)
     {
@@ -240,12 +242,12 @@ Nodo* eliminarNodo(Nodo* raiz, int valor)
         return rotacionDerecha(raiz);
     }
 
-    // derecha derecha Case
+    // derecha derecha 
     if (balance < -1 &&
         getBalance(raiz->derecha) <= 0)
         return rotacionIzquierda(raiz);
 
-    // derecha izquierda Case
+    // derecha izquierda 
     if (balance < -1 &&
         getBalance(raiz->derecha) > 0)
     {

@@ -90,8 +90,8 @@ int Metadata::getSizeOf()
 
 void Metadata::read()
 {
-	int currentPosition = 0;
 	file->open("r");
+	int currentPosition = 0;
 	Metadata* toFind = new Metadata();
 
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
@@ -110,7 +110,7 @@ void Metadata::read()
 	}
 
 	if (!Founded) {
-		cout << "Employee not Founded!" << endl;
+		cout << "Not Founded!" << endl;
 	}
 
 
@@ -280,9 +280,38 @@ char* MapaBits::leerMapaBits(char nombre[20], int MBD, int MBI1, int MBI2, int M
 
 	while (!file->isEOF()) 
 	{
-		toFind->printMapa();
-		Found = true;
-		break;
+		for (int i = 0; i < toFind->bloque1; i++) 
+		{
+			char tmpByte;
+			tmpByte = toFind->ptrsCombinados[i];
+
+			for (int j = 1; j <= 8; j++) {
+				cout << (tmpByte & (1 << 7) ? '1' : '0');
+				tmpByte = tmpByte << 1;
+
+			}
+
+			cout << " ";
+
+		}
+		cout << " " << endl;
+
+		for (int i = toFind->bloque1; i < toFind->bloque2 + toFind->bloque1; i++) {
+
+			char tmpByte;
+			tmpByte = toFind->ptrsCombinados[i];
+
+
+			for (int j = 1; j <= 8; j++) 
+			{
+				cout << (tmpByte & (1 << 7) ? '1' : '0');
+				tmpByte = tmpByte << 1;
+
+			}
+			cout << " ";
+		}
+
+		return toFind->ptrsCombinados;
 		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 		currentPosition += toFind->getSizeOf();
 	}
@@ -379,6 +408,7 @@ void EntradasDirectorio::print()
 {
 	for (int i = 0; i < nEntradasDirectorio; i++)
 	{
+		
 		cout << "nombreEntrada: " << listaEntradas[i].nombreEntrada << endl;
 		cout << "esArchivo: " << listaEntradas[i].esArchivo << endl;
 		cout << "tamanio: " << listaEntradas[i].tamanio << endl;
@@ -452,45 +482,60 @@ void EntradasDirectorio::comandoMKDIR(char nombre[20], long mapaBits, char direc
 	for (int i = 0; i < nEntradasDirectorio; i++)
 	{
 
-		if (strcmp(toFind->listaEntradas[i].nombreEntrada, "undefined") == 0)
+		if (strcmp(toFind->listaEntradas[i].nombreEntrada, currentDirectorio))
 		{
-			memcpy(toFind->listaEntradas[i].nombreEntrada, directorio, strlen(directorio) + 1);
-
-			toFind->listaEntradas[i].indPadre = padreTemporal;
-			toFind->listaEntradas[i].indPrimerHijo = primerHijoTemporal;
+			padreTemporal = i;
 
 
-			if (hermanoIzquierdoTemporal != -1) {
-				toFind->listaEntradas[hermanoIzquierdoTemporal].indHermanoDerecho = i;
-			}
-			if ((padreTemporal >= 0 && toFind->listaEntradas[padreTemporal].indPrimerHijo == -1)) {
-				toFind->listaEntradas[padreTemporal].indPrimerHijo = i;
-			}
-
-			time_t rawtime;
-			struct tm ltm;
-			time(&rawtime);
-			localtime_s(&ltm, &rawtime);
-			std::ostringstream ss;
-			ss << std::put_time(&ltm, "%d%m%Y");
-			memcpy(toFind->listaEntradas[i].fechaCreacion, ss.str().c_str(), strlen(ss.str().c_str()));
-			file->write(toFind->toChar(), sizeof(Metadata) + mapaBits, toFind->getSizeOf());
-			toFind->print();
-			file->close();
-			return;
 
 		}
-		else if (strcmp(toFind->listaEntradas[i].nombreEntrada, currentDirectorio) == 0) 
+		else if (toFind->listaEntradas[i].indPadre != -1 && ((strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, currentDirectorio) == 0) && (toFind->listaEntradas[i].indHermanoDerecho == -1)))
 		{
 			padreTemporal = i;
 		}
-		else if (toFind->listaEntradas[i].indPadre != -1 && (strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, currentDirectorio) == 0))
-		{
-			hermanoIzquierdoTemporal = i;
-		}
+
+
 	}
+
+		for (int i = 0; i < nEntradasDirectorio; i++)
+		{
+
+			if (strcmp(toFind->listaEntradas[i].nombreEntrada, "Indefinido") == 0) {
+
+
+				memcpy(toFind->listaEntradas[i].nombreEntrada, directorio, strlen(directorio) + 1);
+
+				toFind->listaEntradas[i].indPadre = padreTemporal;
+				toFind->listaEntradas[i].indPrimerHijo = primerHijoTemporal;
+
+
+				if (hermanoIzquierdoTemporal != -1) {
+					toFind->listaEntradas[hermanoIzquierdoTemporal].indHermanoDerecho = i;
+				}
+				if ((padreTemporal >= 0 && toFind->listaEntradas[padreTemporal].indPrimerHijo == -1)) {
+					toFind->listaEntradas[padreTemporal].indPrimerHijo = i;
+				}
+
+
+				time_t rawtime;
+				struct tm ltm;
+				time(&rawtime);
+				localtime_s(&ltm, &rawtime);
+				std::ostringstream ss;
+				ss << std::put_time(&ltm, "%d%m%Y");
+				memcpy(toFind->listaEntradas[i].fechaCreacion, ss.str().c_str(), strlen(ss.str().c_str()));
+				file->write(toFind->toChar(), sizeof(Metadata) + mapaBits, toFind->getSizeOf());
+
+				//	toFind->print();
+				file->close();
+				return;
+
+			}
+
+		}
+
 		file->close();
-}
+	}
 
 void EntradasDirectorio::write(char nombre[20], long mapaBits)
 {
@@ -545,7 +590,8 @@ void EntradasDirectorio::agregarLista(Entrada* lista, char nombre[20], long mapa
 		}
 	}
 	lista[espacio].indPadre = padreTemporal;
-	if (hermanoIzquierdoTemporal != -1) {
+	if (hermanoIzquierdoTemporal != -1) 
+	{
 		toFind->listaEntradas[hermanoIzquierdoTemporal].indHermanoDerecho = espacio;
 	}
 	toFind->listaEntradas[espacio] = lista[espacio];
@@ -602,14 +648,21 @@ void EntradasDirectorio::comandoLS(char nombre[20], long mapaBits, char nombreDi
 		}
 	}
 
+	if (padre == -1) {
+		return;
+	}
+
 	cout << "Padre: " << padre << endl;
 	for (int i = 0; i < nEntradasDirectorio; i++) {
 		if (toFind->listaEntradas[i].indPadre == padre) 
 		{
+			char FechaCreacion[9];
 			cout << "DIRECTORIO" << endl;
 			cout << "nombreEntrada: " << toFind->listaEntradas[i].nombreEntrada << endl;
 			cout << "esArchivo: " << toFind->listaEntradas[i].esArchivo << endl;
 			cout << "tamanio: " << toFind->listaEntradas[i].tamanio << endl;
+			memcpy(FechaCreacion, toFind->listaEntradas[i].fechaCreacion, strlen(toFind->listaEntradas[i].fechaCreacion) + 1);
+
 			cout << "fechaCreacion: " << toFind->listaEntradas[i].fechaCreacion << endl;
 
 			cout << "indPadre: " << toFind->listaEntradas[i].indPadre << endl;
@@ -652,7 +705,7 @@ void BloqueDirecto::insertarDatos()
 {
 	for (int i = 0; i < 4096; i++) {
 
-		data[i] = 0;
+		data[i] = '0';
 	}
 }
 
