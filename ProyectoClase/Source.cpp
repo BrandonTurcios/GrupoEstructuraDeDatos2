@@ -2,79 +2,97 @@
 #include <conio.h>
 using namespace std;
 #include "Metadata.h"
-int main() 
-{
-	int opcion = 1; int cantidadDirectorios;
-	char tempDirectorio[30] = "undefined"; char currentDirectorio[30] = "undefined"; char direccion[20]; char comando[20]; char nombreDisco[20];
-	
-	std::cout << "$";
-	std::cin >> comando >> nombreDisco >> cantidadDirectorios;
-	std::cout << comando << endl << nombreDisco << endl << cantidadDirectorios << endl;
 
+int main() {
+
+	int opcion = 1; int cantidadDirectorios;
+	char tempDirectorio[30] = "00000"; char currentDirectorio[30] = "00000"; char path[20]; char comandoCadena[20]; char nombreDisco[20];
+	
+	std::cout << "$	";
+	std::cin >> comandoCadena >> nombreDisco >> cantidadDirectorios;
+
+	//obtener valores para mapa bits
 	long B1 = (((cantidadDirectorios * 33308) % 8 == 0) ? (cantidadDirectorios * 33308) / 8 : ((cantidadDirectorios * 33308) / 8) + 1);
 	long B2 = ((((cantidadDirectorios * 2081) % 8 == 0)) ? (cantidadDirectorios * 2081) / 8 : ((cantidadDirectorios * 2081) / 8) + 1);
 	long B3 = (((cantidadDirectorios * 65) % 8 == 0) ? (cantidadDirectorios * 65) / 8 : ((cantidadDirectorios * 65) / 8) + 1);
 	long B4 = (((cantidadDirectorios * 1) % 8 == 0) ? (cantidadDirectorios * 1) / 8 : ((cantidadDirectorios * 1) / 8) + 1);
-	long Res = B1 + B2 + B3 + B4;
+	long totalBloques = B1 + B2 + B3 + B4;
+
 
 	do {
 
-		if (strcmp(comando, "createdisk") == 0) 
+		if (strcmp(comandoCadena, "createdisk") == 0) 
 		{
-			Metadata test(nombreDisco, cantidadDirectorios);
-			test.guardarDisco();
-			test.abrirDisco(nombreDisco);
-			test.guardarMapaBits();
-			test.read(nombreDisco);
+
+			Metadata proyectoClase(nombreDisco, cantidadDirectorios);
+			proyectoClase.guardarDisco();
+			proyectoClase.abrirDisco(nombreDisco);
+			proyectoClase.read();
 		}
-		else if (strcmp(comando, "mkdir") == 0) 
+		else if (strcmp(comandoCadena, "mkdir") == 0) 
 		{
-			EntradasDirectorio* temp = new EntradasDirectorio(nombreDisco, cantidadDirectorios);
-			temp->setMkdir(nombreDisco, Res, direccion, currentDirectorio);
-			temp->read(nombreDisco, Res);
-			if (strcmp(currentDirectorio, "undefined") == 0) {
-				memcpy(currentDirectorio, direccion, strlen(direccion) + 1);
+			EntradasDirectorio* ED = new EntradasDirectorio(nombreDisco, cantidadDirectorios);
+			ED->comandoMKDIR(nombreDisco, totalBloques, path, currentDirectorio);
+			ED->read(nombreDisco, totalBloques);
+
+			if (strcmp(currentDirectorio, "00000") == 0) 
+			{
+				memcpy(currentDirectorio, path, strlen(path) + 1);
 			}
 		}
-		else if (strcmp(comando, "cd") == 0) {
-			if (strcmp(currentDirectorio, "undefined") == 0) {
+		else if (strcmp(comandoCadena, "cd") == 0) 
+		{
+			if (strcmp(currentDirectorio, "00000") == 0) 
+			{
 				std::cout << "ERROR" << endl;
 			}
-			else {
-				EntradasDirectorio* temp = new EntradasDirectorio(nombreDisco, cantidadDirectorios);
-				std::cout << "Ingresar nuevo directorio: " << endl;
-				if (strcmp(direccion, "..") == 0) {
-					if (temp->existe(nombreDisco, Res, tempDirectorio)) {
+			else 
+			{
+				EntradasDirectorio* ED = new EntradasDirectorio(nombreDisco, cantidadDirectorios);
+				if (strcmp(path, "..") == 0) 
+				{
+					if (ED->existe(nombreDisco, totalBloques, tempDirectorio) != -1) 
+					{
 						memcpy(currentDirectorio, tempDirectorio, strlen(tempDirectorio) + 1);
 					}
-					else {
-						std::cout << "ERROR" << endl;
+					else 
+					{
+						std::cout << "Directorio No Existe!" << endl;
 					}
 				}
-				else {
-					if (temp->existe(nombreDisco, Res, direccion)) {
-						memcpy(currentDirectorio, direccion, strlen(direccion) + 1);
-					}
-					else {
-						std::cout << "ERROR" << endl;
-					}
-				}
-			}
-		}
-		else if (strcmp(comando, "ls") == 0) {
-			if (strcmp(currentDirectorio, "undefined") == 0) {
-				std::cout << "ERROR " << endl;
-			}
-			else {
-				EntradasDirectorio* temp = new EntradasDirectorio(nombreDisco, cantidadDirectorios);
+				else 
+				{
+					if (ED->existe(nombreDisco, totalBloques, path)) 
+					{
+						memcpy(tempDirectorio, currentDirectorio, strlen(currentDirectorio) + 1);
+						memcpy(currentDirectorio, path, strlen(path) + 1);
 
-				std::cout << "Informacion: " << currentDirectorio << endl;
-				temp->comandoLS(nombreDisco, Res, currentDirectorio);
+					}
+					else {
+						std::cout << "Directorio No Existe!" << endl;
+					}
+				}
 			}
 		}
-		std::cout << "$";
-		std::cin >> comando >> direccion;
-		std::cout << comando << endl << direccion << endl;
+		std::cout << "$	";
+		std::cin >> comandoCadena;
+
+		if (strcmp(comandoCadena, "ls") == 0) 
+		{
+			if (strcmp(currentDirectorio, "00000") == 0) 
+			{
+				std::cout << "ERROR" << endl;
+			}
+			else 
+			{
+				EntradasDirectorio* ED = new EntradasDirectorio(nombreDisco, cantidadDirectorios);
+				std::cout << "::::::::::DIRECTORIO:::::::::" << currentDirectorio << endl;
+				ED->comandoLS(nombreDisco, totalBloques, currentDirectorio);
+			}
+		}
+		else {
+			std::cin >> path;
+		}
 
 	} while (true);
 

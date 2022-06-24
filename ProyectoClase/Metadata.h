@@ -21,15 +21,14 @@ private:
 
 
 public:
-	Metadata(const char[20], int);
+	Metadata(char[20], int);
 	Metadata();
 	char* toChar();
 	void fromChar(char*);
-	void abrirDisco(const char[20]);
-	void guardarMapaBits();
+	void abrirDisco(char[20]);
 	void guardarDisco();
 	int getSizeOf();
-	void read(const char*);
+	void read();
 	void print();
 	const char* getNombre();
 
@@ -51,7 +50,7 @@ private:
 	public:
 		MapaBits_BD(int nBloquesBD);
 		MapaBits_BD();
-		char* ptrs; // =new char[nb];
+		char* ptrs; 
 
 		char* toChar();
 		void fromChar(char*);
@@ -61,7 +60,7 @@ private:
 	public:
 		MapaBits_BI1(int nBloquesBI1);
 		MapaBits_BI1();
-		char* ptrs; // =new char[ca>lado];
+		char* ptrs; 
 
 		char* toChar();
 		void fromChar(char*);
@@ -71,7 +70,7 @@ private:
 	public:
 		MapaBits_BI2(int nBloquesBI2);
 		MapaBits_BI2();
-		char* ptrs; // =new char[calculado];
+		char* ptrs; 
 
 		char* toChar();
 		void fromChar(char*);
@@ -81,7 +80,7 @@ private:
 	public:
 		MapaBits_BI3(int nBloquesBI3);
 		MapaBits_BI3();
-		char* ptrs; //= new char[nbloquesI3 / 8];
+		char* ptrs;
 		char* toChar();
 		void fromChar(char*);
 
@@ -92,10 +91,14 @@ public:
 	MapaBits(char[], int, int, int, int);
 	MapaBits(char[]);
 	int getSizeOf();
+	void encender(int);
+	void apagar(char[20], int);
 	char* toChar();
 	void fromChar(char*);
 	void establecerMapaBits(char[]);
-	void leerMapaBits(char[], int, int, int, int);
+	char* leerMapaBits(char[], int, int, int, int);
+	int check(char,int);
+	long encontrarEspacio(char [20],int, int, int, int, int, int,int);
 	void printMapa();
 
 };
@@ -111,7 +114,7 @@ private:
 	struct Entrada
 	{
 		char nombreEntrada[30];
-		bool esArchivo; // 1->File, 0->Folder
+		bool esArchivo;
 		unsigned int tamanio;
 
 		short int indPadre;
@@ -119,10 +122,10 @@ private:
 		short int indHermanoDerecho;
 
 
-		char fechaCreacion[8]; //ddMMyyyy
-		//punterosabloques de datos (Importacion de archivos)
+		char fechaCreacion[8]; 
+	
 		unsigned int ptrsBD[12];
-		unsigned int ptrsBDI[3]; //[0] -> BI1, [1] -> BI2, [2] -> BI3
+		unsigned int ptrsBDI[3]; 
 
 
 	};
@@ -135,24 +138,16 @@ public:
 
 	char* toChar();
 	void fromChar(char*);
-	void setMkdir(char[20], long, char[30], char[30]);
+	void comandoMKDIR(char[20], long, char[30], char[30]);
 	void write(char[20], long);
 	void read(char[20], long);
-	void agregarLista(Entrada*, char[20], long);
+	void agregarLista(Entrada*, char[20], long,int, char[30]);
 	Entrada* getLista(char[20], long);
-	bool existe(char[20], long, char[30]);
+	int existe(char[20], long, char[30]);
 	void comandoLS(char[20], long, char[30]);
 };
 
-class tipoBloque
-{
-public:
-	tipoBloque();
-	virtual char* toChar() = 0;
-	virtual void fromChar(char*) = 0;
-};
-
-class BloqueDirecto :public tipoBloque
+class BloqueDirecto 
 {
 public:
 	BloqueDirecto(int, char[20], long, int);
@@ -173,7 +168,7 @@ private:
 };
 
 
-class BloqueInd1Nivel : public tipoBloque
+class BloqueInd1Nivel 
 {
 public:
 	BloqueInd1Nivel();
@@ -191,7 +186,7 @@ private:
 	unsigned int ptrs[16];
 };
 //
-class BloqueInd2Nivel : public tipoBloque
+class BloqueInd2Nivel 
 {
 public:
 	BloqueInd2Nivel(char[20], int, long);
@@ -209,7 +204,7 @@ private:
 	unsigned int ptrs[32];
 };
 
-class BloqueInd3Nivel :public tipoBloque
+class BloqueInd3Nivel 
 {
 public:
 	BloqueInd3Nivel(char[20], int, long);
@@ -225,24 +220,4 @@ private:
 	long mapaBits;
 	DataFile* file;
 	unsigned int ptrs[64];
-};
-
-class importExport
-{
-public:
-	importExport(char nombre[20]);
-	void importar(char[20], long, int);
-	void exportar(char[20], long);
-	DataFile* file;
-	struct bloque
-	{
-		char data[4096];
-		bloque()
-		{
-			for (int i = 0; i < 4096; i++)
-			{
-				data[i] = '0';
-			}
-		}
-	};
 };

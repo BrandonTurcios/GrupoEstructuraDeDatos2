@@ -1,8 +1,8 @@
 #include "Metadata.h"
 
-Metadata::Metadata(const char nombre[], int entradas) : cantidadEntradasDirectorio(entradas), tamanoBloque(4096), cantidadBloquesDirectos(33308 * entradas), cantidadBloquesInd1Nivel(2081 * entradas), cantidadBloquesInd2Nivel(65 * entradas), cantidadBloquesInd3Nivel(entradas)
+Metadata::Metadata(char nombre[20], int entradas) : cantidadEntradasDirectorio(entradas), tamanoBloque(4096), cantidadBloquesDirectos(33308 * entradas), cantidadBloquesInd1Nivel(2081 * entradas), cantidadBloquesInd2Nivel(65 * entradas), cantidadBloquesInd3Nivel(entradas)
 {
-	abrirDisco(nombre);
+	file = new DataFile(nombre);
 	const char* fecha;
 	std::string fecha_;
 	time_t rawtime;
@@ -20,8 +20,8 @@ Metadata::Metadata(const char nombre[], int entradas) : cantidadEntradasDirector
 
 Metadata::Metadata()
 {
-	memcpy(nombreDisco, "Indefinido", strlen("Indefinido") + 1);
-	memcpy(fechaCreacion, "00000000", strlen("00000000"));
+	memcpy(nombreDisco, "undefined", strlen("undefined") + 1);
+	memcpy(fechaCreacion, "00000000", strlen("00000000")+1);
 }
 
 char* Metadata::toChar()
@@ -52,9 +52,25 @@ void Metadata::fromChar(char* readChar)
 	memcpy(&cantidadBloquesInd3Nivel, &readChar[sizeof(nombreDisco) + sizeof(fechaCreacion) + sizeof(cantidadEntradasDirectorio) + sizeof(tamanoBloque) + sizeof(cantidadBloquesDirectos) + sizeof(cantidadBloquesInd1Nivel) + sizeof(cantidadBloquesInd2Nivel)], sizeof(cantidadBloquesInd3Nivel));
 }
 
-void Metadata::abrirDisco(const char nombre[20])
+void Metadata::abrirDisco(char nombre[20])
 {
-	file = new DataFile(nombre);
+	MapaBits* MB = new MapaBits(nombre, cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	MB->establecerMapaBits(nombre);
+
+	long B1 = (((cantidadBloquesDirectos) % 8 == 0) ? cantidadBloquesDirectos / 8 : cantidadBloquesDirectos / 8 + 1);
+	long B2 = (((cantidadBloquesInd1Nivel) % 8 == 0) ? cantidadBloquesInd1Nivel / 8 : cantidadBloquesInd1Nivel / 8 + 1);
+	long B3 = (((cantidadBloquesInd2Nivel) % 8 == 0) ? cantidadBloquesInd2Nivel / 8 : cantidadBloquesInd2Nivel / 8 + 1);
+	long B4 = (((cantidadBloquesInd3Nivel) % 8 == 0) ? cantidadBloquesInd3Nivel / 8 : cantidadBloquesInd3Nivel / 8 + 1);
+
+	EntradasDirectorio* ED = new EntradasDirectorio(nombre, cantidadEntradasDirectorio);
+	long Res = B1 + B2 + B3 + B4;
+	ED->write(nombre, Res);
+	ED->read(nombre, Res);
+
+	BloqueDirecto* BD = new BloqueDirecto(cantidadBloquesDirectos, nombre, Res, cantidadEntradasDirectorio);
+	BloqueInd1Nivel* B1N = new BloqueInd1Nivel(nombre, cantidadEntradasDirectorio, Res);
+	BloqueInd2Nivel* B2N = new BloqueInd2Nivel(nombre, cantidadEntradasDirectorio, Res);
+	BloqueInd3Nivel* B3N = new BloqueInd3Nivel(nombre, cantidadEntradasDirectorio, Res);
 
 }
 
@@ -65,14 +81,6 @@ void Metadata::guardarDisco()
 	Metadata* newone = new Metadata(nombreDisco, cantidadEntradasDirectorio);
 	file->write(newone->toChar(), 0, newone->getSizeOf());
 	file->close();
-
-	EntradasDirectorio* entradas = new EntradasDirectorio(nombreDisco, cantidadEntradasDirectorio);
-}
-
-void Metadata::guardarMapaBits()
-{
-	MapaBits* mapa = new MapaBits(nombreDisco, cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
-	mapa->establecerMapaBits(nombreDisco);
 }
 
 int Metadata::getSizeOf()
@@ -80,35 +88,34 @@ int Metadata::getSizeOf()
 	return sizeof(Metadata);
 }
 
-void Metadata::read(const char* _nombre)
+void Metadata::read()
 {
-	Metadata* toFind = new Metadata();
-	int CurrentPosition = 0;
+	int currentPosition = 0;
 	file->open("r");
-	toFind->fromChar(file->read(CurrentPosition, toFind->getSizeOf()));
-	bool found = false;
-	CurrentPosition += toFind->getSizeOf();
-	while (!file->isEOF())
-	{
+	Metadata* toFind = new Metadata();
 
-		//strcmp(toFind->getNombre(), _nombre) == 0
-		if (strcmp(toFind->getNombre(), _nombre) == 0)
-		{
-			toFind->print();
-			found = true;
-			break;
-		}
-		toFind->fromChar(file->read(CurrentPosition, toFind->getSizeOf()));
-		CurrentPosition += toFind->getSizeOf();
+	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
+	currentPosition += toFind->getSizeOf();
+	bool Founded = false;
+
+	while (!file->isEOF()) {
+
+		toFind->print();
+		Founded = true;
+		break;
+
+		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
+		currentPosition += toFind->getSizeOf();
 
 	}
-	if (!found)
-		cout << "Not found";
 
-	MapaBits* mapa = new MapaBits(nombreDisco);
-	mapa->leerMapaBits(nombreDisco, cantidadBloquesDirectos, cantidadBloquesInd1Nivel, cantidadBloquesInd2Nivel, cantidadBloquesInd3Nivel);
+	if (!Founded) {
+		cout << "Employee not Founded!" << endl;
+	}
+
 
 	file->close();
+
 }
 
 void Metadata::print()
@@ -132,7 +139,7 @@ MapaBits::MapaBits_BD::MapaBits_BD(int numeroBloquesDirectos)
 	ptrs = new char[numeroBloquesDirectos + 1];
 	for (int i = 0; i < numeroBloquesDirectos; i++)
 	{
-		ptrs[i] = '0';
+		ptrs[i] = 0;
 	}
 	ptrs[numeroBloquesDirectos] = '\0';
 
@@ -161,7 +168,7 @@ MapaBits::MapaBits_BI1::MapaBits_BI1(int numeroBloquesIndirectos1)
 	ptrs = new char[numeroBloquesIndirectos1 + 1];
 	for (int i = 0; i < numeroBloquesIndirectos1; i++)
 	{
-		ptrs[i] = '0';
+		ptrs[i] = 0;
 	}
 	ptrs[numeroBloquesIndirectos1] = '\0';
 }
@@ -187,7 +194,7 @@ MapaBits::MapaBits_BI2::MapaBits_BI2(int nBloquesBI2)
 	ptrs = new char[nBloquesBI2 + 1];
 	for (int i = 0; i < nBloquesBI2; i++)
 	{
-		ptrs[i] = '0';
+		ptrs[i] = 0;
 	}
 	ptrs[nBloquesBI2] = '\0';
 }
@@ -213,7 +220,7 @@ MapaBits::MapaBits_BI3::MapaBits_BI3(int numeroBloquesIndirectos3)
 	ptrs = new char[numeroBloquesIndirectos3 + 1];
 	for (int i = 0; i < numeroBloquesIndirectos3; i++)
 	{
-		ptrs[i] = '0';
+		ptrs[i] = 0;
 	}
 	ptrs[numeroBloquesIndirectos3] = '\0';
 }
@@ -232,15 +239,14 @@ char* MapaBits::MapaBits_BI3::toChar()
 
 MapaBits::MapaBits(char nombre[20], int numBloquesDirectos, int numBloquesIndirectos1, int numeroBloquesIndirectos2, int numeroBloquesIndirectos3) : bloque1(((numBloquesDirectos / 8) % 2 == 0) ? numBloquesDirectos / 8 : numBloquesDirectos / 8 + 1), bloque2(((numBloquesIndirectos1 / 8) % 2 == 0) ? numBloquesIndirectos1 / 8 : numBloquesIndirectos1 / 8 + 1), bloque3(((numeroBloquesIndirectos2 / 8) % 2 == 0) ? numeroBloquesIndirectos2 / 8 : numeroBloquesIndirectos2 / 8 + 1), bloque4(((numeroBloquesIndirectos3 / 8) % 2 == 0) ? numeroBloquesIndirectos3 / 8 : numeroBloquesIndirectos3 / 8 + 1)
 {
-	file = new DataFile(nombre);
 
+	file = new DataFile(nombre);
 	MapaBits_BD* bloqueDirecto = new MapaBits_BD(bloque1);
 	MapaBits_BI1* bloqueI1 = new MapaBits_BI1(bloque2);
 
 	MapaBits_BI2* bloqueI2 = new MapaBits_BI2(bloque3);
 	MapaBits_BI3* bloqueI3 = new MapaBits_BI3(bloque4);
 	char* charResult = new char[sizeof(Metadata)];
-
 	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
 
 	memcpy(&ptrsCombinados[0], (bloqueDirecto->toChar()), bloque1);
@@ -254,17 +260,15 @@ MapaBits::MapaBits(char nombre[20], int numBloquesDirectos, int numBloquesIndire
 MapaBits::MapaBits(char nombre[20])
 {
 	file = new DataFile(nombre);
-
 	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
 }
 
-void MapaBits::leerMapaBits(char nombre[20], int MBD, int MBI1, int MBI2, int MBI3)
+char* MapaBits::leerMapaBits(char nombre[20], int MBD, int MBI1, int MBI2, int MBI3)
 {
 	int currentPosition = sizeof(Metadata);
+	file = new DataFile(nombre);
 	file->open("r");
-
 	MapaBits* toFind = new MapaBits(nombre);
-
 	toFind->bloque1 = (((MBD / 8) % 2 == 0) ? MBD / 8 : MBD / 8 + 1);
 	toFind->bloque2 = (((MBI1 / 8) % 2 == 0) ? MBI1 / 8 : MBI1 / 8 + 1);
 	toFind->bloque3 = (((MBI2 / 8) % 2 == 0) ? MBI2 / 8 : MBI2 / 8 + 1);
@@ -274,9 +278,8 @@ void MapaBits::leerMapaBits(char nombre[20], int MBD, int MBI1, int MBI2, int MB
 	currentPosition += sizeof(Metadata);
 	bool Found = false;
 
-	while (!file->isEOF()) {
-
-
+	while (!file->isEOF()) 
+	{
 		toFind->printMapa();
 		Found = true;
 		break;
@@ -284,26 +287,68 @@ void MapaBits::leerMapaBits(char nombre[20], int MBD, int MBI1, int MBI2, int MB
 		currentPosition += toFind->getSizeOf();
 	}
 
-	if (!Found) {
-		cout << "Employee not found" << endl;
-	}
 	file->close();
+	return NULL;
 }
 
 void MapaBits::printMapa()
 {
-	cout << "Mapa { " << ptrsCombinados << "}" << endl;
+	cout << "MapaBits { " << ptrsCombinados << "}" << endl;
+}
+
+void MapaBits::encender(int bloque)
+{
+	int posicion = bloque / 8;
+	int inicio = posicion + 8;
+
+	for (int i = inicio, shift = 7; i < inicio + 8; i++, shift--) 
+	{
+		if (bloque == i) 
+		{
+			ptrsCombinados[posicion] |= (1 << shift);
+			break;
+		}
+	}
+}
+
+void MapaBits::apagar(char nombre[20], int bloque)
+{
+	ptrsCombinados = new char[bloque1 + bloque2 + bloque3 + bloque4 + 1];
+	memcpy(&ptrsCombinados[0], leerMapaBits(nombre, bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8), bloque1 + bloque2 + bloque3 + bloque4 + 1);
+	int posicion = bloque / 8;
+	int inicio = posicion + 8;
+	for (int i =inicio, shift = 7; i < inicio + 8; i++, shift--) 
+	{
+		if (bloque == i) 
+		{
+			ptrsCombinados[posicion] = ptrsCombinados[posicion] & ~(1 << shift);
+			establecerMapaBits(nombre);
+			break;
+		}
+
+
+	}
 }
 
 void MapaBits::establecerMapaBits(char nombre[20])
 {
 	file->open("w");
-
-	MapaBits* newone = new MapaBits(nombre, bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
-
-	file->write(newone->toChar(), sizeof(Metadata), newone->getSizeOf());
-
+	MapaBits* newMB = new MapaBits(nombre, bloque1 * 8, bloque2 * 8, bloque3 * 8, bloque4 * 8);
+	file->write(newMB->toChar(), sizeof(Metadata), newMB->getSizeOf());
 	file->close();
+}
+
+int MapaBits::check(char byte, int bloque)
+{
+	int total = bloque % 8 == 0 ? (bloque / 8) + 1 : (bloque / 8) + 1;
+	for (int j = 0; j <= 7; j++) {
+
+		if ((8 - (total * 8 - bloque)) == j) {
+			return (byte & (1 << 7) ? 1 : 0);
+		}
+		byte= byte << 1;
+	}
+	return -1;
 }
 
 char* MapaBits::toChar()
@@ -327,51 +372,20 @@ int MapaBits::getSizeOf()
 EntradasDirectorio::EntradasDirectorio(char nombre[20], int _cantidadEntradas) :nEntradasDirectorio(_cantidadEntradas)
 {
 	file = new DataFile(nombre);
-	//listaEntradas = new Entrada[2];
 	listaEntradas = new Entrada[nEntradasDirectorio];
-	Entrada Temporal = Entrada();
-
-	for (int i = 0; i < nEntradasDirectorio; i++)
-	{
-		listaEntradas[i] = Temporal;
-	}
-
-	for (int i = 0; i < nEntradasDirectorio; i++)
-	{
-		memcpy(listaEntradas[i].nombreEntrada, "undefined", strlen("undefined") + 1);
-
-		listaEntradas[i].esArchivo = false;
-		listaEntradas[i].tamanio = 0;
-
-		listaEntradas[i].indPadre = -1;
-		listaEntradas[i].indPrimerHijo = -1;
-		listaEntradas[i].indHermanoDerecho = -1;
-
-		memcpy(listaEntradas[i].fechaCreacion, "0000000", strlen("0000000") + 1);
-
-
-
-		for (int j = 0; j < 12; j++) {
-			listaEntradas[i].ptrsBD[j] = 0;
-			if (j <= 3) {
-				listaEntradas[i].ptrsBDI[j] = 0;
-			}
-		}
-
-	}
 }
 
 void EntradasDirectorio::print()
 {
 	for (int i = 0; i < nEntradasDirectorio; i++)
 	{
-		cout << "Nombre: " << listaEntradas[i].nombreEntrada << endl;
-		cout << "EsArchivo: " << listaEntradas[i].esArchivo << endl;
-		cout << "Tamanio: " << listaEntradas[i].tamanio << endl;
-		cout << "FechaCreacion: " << listaEntradas[i].fechaCreacion << endl;
-		cout << "IndPadre: " << listaEntradas[i].indPadre << endl;
-		cout << "IndHijo: " << listaEntradas[i].indPrimerHijo << endl;
-		cout << "IndHermanoDerecho: " << listaEntradas[i].indHermanoDerecho << endl;
+		cout << "nombreEntrada: " << listaEntradas[i].nombreEntrada << endl;
+		cout << "esArchivo: " << listaEntradas[i].esArchivo << endl;
+		cout << "tamanio: " << listaEntradas[i].tamanio << endl;
+		cout << "fechaCreacion: " << listaEntradas[i].fechaCreacion << endl;
+		cout << "indPadre: " << listaEntradas[i].indPadre << endl;
+		cout << "indHijo: " << listaEntradas[i].indPrimerHijo << endl;
+		cout << "indHermanoDerecho: " << listaEntradas[i].indHermanoDerecho << endl;
 
 
 	}
@@ -379,15 +393,13 @@ void EntradasDirectorio::print()
 
 int EntradasDirectorio::getSizeOf()
 {
-	return 70 * nEntradasDirectorio;
+	return 109 * nEntradasDirectorio;
 }
 
 char* EntradasDirectorio::toChar()
 {
 	char* charResult = new char[109 * nEntradasDirectorio];
-
 	long pointer = 0;
-
 	for (int i = 0; i < nEntradasDirectorio; i++) {
 
 		memcpy(&charResult[pointer], listaEntradas[i].nombreEntrada, sizeof(listaEntradas[i].nombreEntrada));
@@ -409,8 +421,8 @@ char* EntradasDirectorio::toChar()
 void EntradasDirectorio::fromChar(char* charRead)
 {
 	long pointer = 0;
-
-	for (int i = 0; i < nEntradasDirectorio; i++) {
+	for (int i = 0; i < nEntradasDirectorio; i++) 
+	{
 		memcpy(listaEntradas[i].nombreEntrada, &charRead[pointer], sizeof(listaEntradas[i].nombreEntrada));
 		memcpy(&listaEntradas[i].esArchivo, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada)], sizeof(listaEntradas[i].esArchivo));
 		memcpy(&listaEntradas[i].tamanio, &charRead[pointer + sizeof(listaEntradas[i].nombreEntrada) + sizeof(listaEntradas[i].esArchivo)], sizeof(listaEntradas[i].tamanio));
@@ -427,60 +439,57 @@ void EntradasDirectorio::fromChar(char* charRead)
 
 }
 
-void EntradasDirectorio::setMkdir(char nombre[20], long mapaBits, char directorio[30], char currentDirectorio[30])
+void EntradasDirectorio::comandoMKDIR(char nombre[20], long mapaBits, char directorio[30], char currentDirectorio[30])
 {
 	file->open("rw");
 	int currentPosition = sizeof(Metadata) + mapaBits;
-	
 	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
-	currentPosition += sizeof(EntradasDirectorio);
-
 	short int padreTemporal = -1;
 	short int primerHijoTemporal = -1;
-	short int hermanoIzquierdoTemp = -1;
+	short int hermanoIzquierdoTemporal = -1;
 
-	while (!file->isEOF()) {
+	for (int i = 0; i < nEntradasDirectorio; i++)
+	{
 
-		for (int i = 0; i < nEntradasDirectorio; i++) {
+		if (strcmp(toFind->listaEntradas[i].nombreEntrada, "undefined") == 0)
+		{
+			memcpy(toFind->listaEntradas[i].nombreEntrada, directorio, strlen(directorio) + 1);
 
-			if (strcmp(toFind->listaEntradas[i].nombreEntrada, "Indefinido") == 0) {
-				memcpy(toFind->listaEntradas[i].nombreEntrada, directorio, strlen(directorio) + 1);
-
-				toFind->listaEntradas[i].indPadre = padreTemporal;
-				toFind->listaEntradas[i].indPrimerHijo = primerHijoTemporal;
-				toFind->listaEntradas[hermanoIzquierdoTemp].indHermanoDerecho = i;
-
-				if (padreTemporal >= 0 && toFind->listaEntradas[padreTemporal].indPrimerHijo == -1) {
-					toFind->listaEntradas[padreTemporal].indPrimerHijo = i;
-				}
-
-				file->write(toFind->toChar(), sizeof(Metadata) + mapaBits, toFind->getSizeOf());
+			toFind->listaEntradas[i].indPadre = padreTemporal;
+			toFind->listaEntradas[i].indPrimerHijo = primerHijoTemporal;
 
 
-				file->close();
-
-				return;
-
+			if (hermanoIzquierdoTemporal != -1) {
+				toFind->listaEntradas[hermanoIzquierdoTemporal].indHermanoDerecho = i;
 			}
-			else if (strcmp(toFind->listaEntradas[i].nombreEntrada, currentDirectorio) == 0) {
-
-				padreTemporal = i;
+			if ((padreTemporal >= 0 && toFind->listaEntradas[padreTemporal].indPrimerHijo == -1)) {
+				toFind->listaEntradas[padreTemporal].indPrimerHijo = i;
 			}
-			else if ((strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, currentDirectorio) == 0) && toFind->listaEntradas[i].indHermanoDerecho == -1) {
 
-
-				hermanoIzquierdoTemp = i;
-			}
+			time_t rawtime;
+			struct tm ltm;
+			time(&rawtime);
+			localtime_s(&ltm, &rawtime);
+			std::ostringstream ss;
+			ss << std::put_time(&ltm, "%d%m%Y");
+			memcpy(toFind->listaEntradas[i].fechaCreacion, ss.str().c_str(), strlen(ss.str().c_str()));
+			file->write(toFind->toChar(), sizeof(Metadata) + mapaBits, toFind->getSizeOf());
+			toFind->print();
+			file->close();
+			return;
 
 		}
-
-		toFind->print();
-		toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
-		currentPosition += sizeof(EntradasDirectorio);
+		else if (strcmp(toFind->listaEntradas[i].nombreEntrada, currentDirectorio) == 0) 
+		{
+			padreTemporal = i;
+		}
+		else if (toFind->listaEntradas[i].indPadre != -1 && (strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, currentDirectorio) == 0))
+		{
+			hermanoIzquierdoTemporal = i;
+		}
 	}
-
-	file->close();
+		file->close();
 }
 
 void EntradasDirectorio::write(char nombre[20], long mapaBits)
@@ -504,17 +513,50 @@ void EntradasDirectorio::read(char nombre[20], long mapaBits)
 
 }
 
-void EntradasDirectorio::agregarLista(Entrada* lista, char nombre[20], long mapaBits)
+void EntradasDirectorio::agregarLista(Entrada* lista, char nombre[20], long mapaBits, int espacio, char padre[30])
 {
+	file = new DataFile(nombre);
+	int currentPosition = sizeof(Metadata) + mapaBits;
+
 	file->open("rw");
-	EntradasDirectorio* newED = new EntradasDirectorio(nombre, nEntradasDirectorio);
-	newED->listaEntradas = lista;
-	file->write(newED->toChar(), sizeof(Metadata) + mapaBits, newED->getSizeOf());
+
+	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
+
+	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
+
+	short int padreTemporal = -1;
+	short int TempindPrimerHijo = -1;
+	short int hermanoIzquierdoTemporal = -1;
+
+	for (int i = 0; i < nEntradasDirectorio; i++)
+	{
+		if (strcmp(toFind->listaEntradas[i].nombreEntrada, padre) == 0) 
+		{  
+
+			padreTemporal = i;
+
+		}
+	}
+
+	for (int i = 0; i < nEntradasDirectorio; i++) 
+	{
+		if (toFind->listaEntradas[i].indPadre != -1 && ((strcmp(toFind->listaEntradas[toFind->listaEntradas[i].indPadre].nombreEntrada, padre) == 0) && (toFind->listaEntradas[i].indHermanoDerecho == -1))) {
+			hermanoIzquierdoTemporal = i;
+		}
+	}
+	lista[espacio].indPadre = padreTemporal;
+	if (hermanoIzquierdoTemporal != -1) {
+		toFind->listaEntradas[hermanoIzquierdoTemporal].indHermanoDerecho = espacio;
+	}
+	toFind->listaEntradas[espacio] = lista[espacio];
+	file->write(toFind->toChar(), sizeof(Metadata) + mapaBits, toFind->getSizeOf());
 	file->close();
+
 }
 
 EntradasDirectorio::Entrada* EntradasDirectorio::getLista(char nombre[20], long mapaBits)
 {
+	file = new DataFile(nombre);
 	file->open("r");
 	int currentPosition = sizeof(Metadata) + mapaBits;
 	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
@@ -523,7 +565,7 @@ EntradasDirectorio::Entrada* EntradasDirectorio::getLista(char nombre[20], long 
 	return toFind->listaEntradas;
 }
 
-bool EntradasDirectorio::existe(char nombre[20], long mapaBits, char nombreDirectorio[30])
+int EntradasDirectorio::existe(char nombre[20], long mapaBits, char nombreDirectorio[30])
 {
 	file->open("r");
 	int currentPosition = sizeof(Metadata) + mapaBits;
@@ -534,12 +576,12 @@ bool EntradasDirectorio::existe(char nombre[20], long mapaBits, char nombreDirec
 	{
 		if (strcmp(toFind->listaEntradas[i].nombreEntrada, nombreDirectorio) == 0)
 		{
-			return true;
+			return i;
 		}
 	}
 
 	file->close();
-	return false;
+	return -1;
 }
 
 void EntradasDirectorio::comandoLS(char nombre[20], long mapaBits, char nombreDirectorio[30])
@@ -549,7 +591,7 @@ void EntradasDirectorio::comandoLS(char nombre[20], long mapaBits, char nombreDi
 	EntradasDirectorio* toFind = new EntradasDirectorio(nombre, nEntradasDirectorio);
 	toFind->fromChar(file->read(currentPosition, toFind->getSizeOf()));
 
-	int padre = 1;
+	int padre = -1;
 
 	for (int i = 0; i < nEntradasDirectorio; i++) {
 		if (strcmp(toFind->listaEntradas[i].nombreEntrada, nombreDirectorio) == 0) {
@@ -560,38 +602,26 @@ void EntradasDirectorio::comandoLS(char nombre[20], long mapaBits, char nombreDi
 		}
 	}
 
-	cout << "PadreTotal: " << padre << endl;
+	cout << "Padre: " << padre << endl;
 	for (int i = 0; i < nEntradasDirectorio; i++) {
+		if (toFind->listaEntradas[i].indPadre == padre) 
+		{
+			cout << "DIRECTORIO" << endl;
+			cout << "nombreEntrada: " << toFind->listaEntradas[i].nombreEntrada << endl;
+			cout << "esArchivo: " << toFind->listaEntradas[i].esArchivo << endl;
+			cout << "tamanio: " << toFind->listaEntradas[i].tamanio << endl;
+			cout << "fechaCreacion: " << toFind->listaEntradas[i].fechaCreacion << endl;
 
-		if (toFind->listaEntradas[i].indPadre == padre) {
-			cout << "**Informacion del Directorio*" << endl;
-			cout << "Nombre: " << toFind->listaEntradas[i].nombreEntrada << endl;
-			cout << "EsArchivo: " << toFind->listaEntradas[i].esArchivo << endl;
-			cout << "Size: " << toFind->listaEntradas[i].tamanio << endl;
-			cout << "FechaDeCreacion: " << toFind->listaEntradas[i].fechaCreacion << endl;
-
-			cout << "Indice Padre: " << toFind->listaEntradas[i].indPadre << endl;
-			cout << "Indice Hijo: " << toFind->listaEntradas[i].indPrimerHijo << endl;
+			cout << "indPadre: " << toFind->listaEntradas[i].indPadre << endl;
+			cout << "indHijo: " << toFind->listaEntradas[i].indPrimerHijo << endl;
 			cout << "Indice HermanoDerecho: " << toFind->listaEntradas[i].indHermanoDerecho << endl;
-
-			for (int j = 0; j < 12; j++) {
-				cout << "ptrsBD: " << toFind->listaEntradas[i].ptrsBD[j] << endl;
-			}
 		}
-
 	}
-
-
-
-
 	file->close();
 }
 
 //_____________________________________________
 
-tipoBloque::tipoBloque()
-{
-}
 
 BloqueDirecto::BloqueDirecto(int bloques, char nombre[20], long mapaBits, int _nEntradasDirectorio)
 {
@@ -610,11 +640,7 @@ BloqueDirecto::BloqueDirecto(char nombre[20])
 
 void BloqueDirecto::read(int bloques, char[20], long mapaBits)
 {
-
-	int currentPosition = mapaBits + sizeof(Metadata) + (nEntradasDirectorio * 109);//sizeof(Metadata) + sizeof(MapaBits) + sizeof(EntradasDirectorio);
-
-	cout << "Tamaños: META: " << sizeof(Metadata) << " MAPABITS: " << sizeof(MapaBits) << "EntradDir" << sizeof(EntradasDirectorio) << endl;
-
+	int currentPosition = mapaBits + sizeof(Metadata) + (nEntradasDirectorio * 109);
 }
 
 char* BloqueDirecto::toChar()
@@ -626,7 +652,7 @@ void BloqueDirecto::insertarDatos()
 {
 	for (int i = 0; i < 4096; i++) {
 
-		data[i] = '0';
+		data[i] = 0;
 	}
 }
 
@@ -681,7 +707,7 @@ void BloqueInd1Nivel::insertarDatos()
 {
 	for (int i = 0; i < 16; i++)
 	{
-		ptrs[i] = 1111111;
+		ptrs[i] = 0;
 
 	}
 }
@@ -775,7 +801,7 @@ void BloqueInd2Nivel::insertarDatos()
 {
 	for (int i = 0; i < 32; i++)
 	{
-		ptrs[i] = 22222222;
+		ptrs[i] = 0;
 	}
 }
 
@@ -809,7 +835,7 @@ void BloqueInd3Nivel::insertarDatos()
 {
 	for (int i = 0; i < 64; i++)
 	{
-		ptrs[i] = 333333;
+		ptrs[i] = 0;
 	}
 }
 
@@ -861,143 +887,3 @@ void BloqueInd3Nivel::read()
 	file->close();
 }
 
-//_____________________________________________
-
-importExport::importExport(char nombre[20])
-{
-	file = new DataFile(nombre);
-}
-
-void importExport::importar(char nombre[20], long mapaBits, int cantidad)
-{
-	ifstream import("imagen.jpg", ios::in | ios::binary);
-	fstream file(nombre, ios::in | ios::out | ios::binary);
-	if (!import) {
-		return;
-	}
-
-	EntradasDirectorio* nuevo = new EntradasDirectorio(nombre, 2);
-
-	nuevo->read(nombre, mapaBits);
-	nuevo->listaEntradas;
-
-	strcpy_s(nuevo->listaEntradas[0].nombreEntrada, strlen("imagen.jpg") + 1, "imagen.jpg");
-
-	nuevo->listaEntradas[0].esArchivo = 1;
-
-	import.seekg(0, ios::end);
-
-	int tamanioBystes = import.tellg();
-
-	nuevo->listaEntradas[0].tamanio = tamanioBystes;
-
-	if (tamanioBystes / 4096 >= 10) {
-
-		cout << "ERROR" << endl;
-		import.close();
-		file.close();
-	}
-	int cantidadBloquesUso = tamanioBystes / 4096;
-	bloque lectura;
-	import.seekg(0, ios::beg);
-
-	file.seekp(mapaBits + sizeof(Metadata) + cantidad * 109);
-	unsigned int posicion = file.tellp();
-	int i;
-	for (i = 0; i < cantidadBloquesUso; i++)
-	{
-		nuevo->listaEntradas[0].ptrsBD[i] = posicion;
-
-		import.read(reinterpret_cast<char*>(&lectura), 4096);
-		file.write(reinterpret_cast<const char*>(&lectura), sizeof(bloque));
-		posicion = file.tellp();
-	}
-
-	unsigned int bytesRe = tamanioBystes - (cantidadBloquesUso * 4096);
-
-
-
-	if (bytesRe > 0) {
-		//	file.seekg(NuevoArchivo->lista->ptrsBD[cantidadBloquesUso], ios::beg);
-
-		nuevo->listaEntradas[0].ptrsBD[cantidadBloquesUso] = posicion;
-		import.read(reinterpret_cast<char*>(&lectura), bytesRe);
-		file.write(reinterpret_cast<const char*>(&lectura), sizeof(bloque));
-	}
-
-	for (int i = 0; i < 2; i++) {
-
-		cout << "Informacion Directorio" << endl;
-		cout << "Nombre: " << nuevo->listaEntradas[i].nombreEntrada << endl;
-		cout << "EsArchivo: " << nuevo->listaEntradas[i].esArchivo << endl;
-		cout << "Size: " << nuevo->listaEntradas[i].tamanio << endl;
-		cout << "FechaCreacion: " << nuevo->listaEntradas[i].fechaCreacion << endl;
-
-		cout << "Indice Padre: " << nuevo->listaEntradas[i].indPadre << endl;
-		cout << "Indice Hijo: " << nuevo->listaEntradas[i].indPrimerHijo << endl;
-		cout << "Indice HermanoDerecho: " << nuevo->listaEntradas[i].indHermanoDerecho << endl;
-
-		for (int j = 0; j < 12; j++) {
-			cout << "ptrs: " << nuevo->listaEntradas[i].ptrsBD[j] << endl;
-		}
-	}
-
-	nuevo->agregarLista(nuevo->listaEntradas, nombre, mapaBits);
-	file.seekp(sizeof(Metadata), ios::beg);
-	file.write(reinterpret_cast<const char*>(&nuevo), sizeof(EntradasDirectorio));
-	cout << "Importado con exito!" << endl;
-	import.close();
-	file.close();
-
-
-
-
-}
-
-void importExport::exportar(char nombre[20], long mapaBits)
-{
-	DataFile* file = new DataFile(nombre);
-	file->open("r");
-	if (!file)
-	{
-		cout << "Error" << endl;
-		return;
-	}
-
-	EntradasDirectorio* nuevo = new EntradasDirectorio(nombre, 2);
-	nuevo->listaEntradas = nuevo->getLista(nombre, mapaBits);
-
-	ofstream exportado("imagenExportada.jpg", ios::beg | ios::binary);
-	fstream file1(nombre, ios::in | ios::out | ios::binary);
-
-	if (!exportado)
-	{
-		file->close();
-		cout << "Error" << endl;
-		return;
-	}
-	bloque b;
-	int cantidadBloques = nuevo->listaEntradas[0].tamanio / 4096;
-	int i;
-	for (i = 0; i < cantidadBloques; i++)
-	{
-		file1.seekg(nuevo->listaEntradas[0].ptrsBD[i], ios::beg);
-		file1.read(reinterpret_cast<char*>(&b.data), 4096);
-		exportado.write(reinterpret_cast<const char*>(&b.data), 4096);
-	}
-
-	unsigned int bytesRe = nuevo->listaEntradas[0].tamanio - (cantidadBloques * 4096);
-
-	if (bytesRe > 0)
-	{
-		file1.seekg(nuevo->listaEntradas[0].ptrsBD[i], ios::beg);
-
-		cout << "SYSTEM AAAAAAAA2: " << nuevo->listaEntradas[0].ptrsBD[i] << endl;
-		file1.read(reinterpret_cast<char*>(&b.data), bytesRe);
-		exportado.write(reinterpret_cast<const char*>(&b.data), bytesRe);
-	}
-	cout << "Exportado Exitosamente!" << endl;
-	exportado.close();
-	file1.close();
-	file->close();
-}
