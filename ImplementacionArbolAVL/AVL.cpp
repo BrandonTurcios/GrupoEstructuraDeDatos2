@@ -283,6 +283,7 @@ int main()
     cout << endl << "----eliminar 7----------" << endl;
  
     test = eliminarNodo(test, 7);
+
     cout << endl << "-----PREORDEN----------" << endl;
     imprimirPreOrden(test);
     cout << endl << "-----POSTORDEN----------" << endl;
