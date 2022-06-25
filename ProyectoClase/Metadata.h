@@ -1,12 +1,15 @@
-#include <iostream>
 #include "DataFile.h"
 #include <iostream>
+#include<sstream>
+#include <iomanip>
+
+using namespace std;
 class Metadata
 {
 private:
 	DataFile* file;
 	char nombreDisco[20];
-	char fechaCreacion[8]; //ddMMyyyy
+	char fechaCreacion[9]; //ddMMyyyy
 	//entradas de directorios
 	int cantidadEntradasDirectorio; //dado por el usuario
 	//bloques de datos
@@ -18,24 +21,36 @@ private:
 
 
 public:
+	Metadata(char[20], int);
 	Metadata();
 	char* toChar();
 	void fromChar(char*);
-	void crearDisco();
+	void abrirDisco(char[20]);
 	void guardarDisco();
 	int getSizeOf();
+	void read();
+	void print();
+	const char* getNombre();
 
 };
-
 
 
 class MapaBits
 {
 private:
+	DataFile* file;
+	char* ptrsCombinados;
+	int bloque1;
+	int bloque2;
+	int bloque3;
+	int bloque4;
+
 	class MapaBits_BD
 	{
 	public:
-		char* ptrs; // =new char[nb];
+		MapaBits_BD(int nBloquesBD);
+		MapaBits_BD();
+		char* ptrs; 
 
 		char* toChar();
 		void fromChar(char*);
@@ -43,7 +58,9 @@ private:
 	class MapaBits_BI1
 	{
 	public:
-		char* ptrs; // =new char[ca>lado];
+		MapaBits_BI1(int nBloquesBI1);
+		MapaBits_BI1();
+		char* ptrs; 
 
 		char* toChar();
 		void fromChar(char*);
@@ -51,7 +68,9 @@ private:
 	class MapaBits_BI2
 	{
 	public:
-		char* ptrs; // =new char[calculado];
+		MapaBits_BI2(int nBloquesBI2);
+		MapaBits_BI2();
+		char* ptrs; 
 
 		char* toChar();
 		void fromChar(char*);
@@ -59,11 +78,29 @@ private:
 	class MapaBits_BI3
 	{
 	public:
-		char* ptrs; //= new char[nbloquesI3 / 8];
-
+		MapaBits_BI3(int nBloquesBI3);
+		MapaBits_BI3();
+		char* ptrs;
 		char* toChar();
 		void fromChar(char*);
+
 	};
+
+public:
+
+	MapaBits(char[], int, int, int, int);
+	MapaBits(char[]);
+	int getSizeOf();
+	void encender(int);
+	void apagar(char[20], int);
+	char* toChar();
+	void fromChar(char*);
+	void establecerMapaBits(char[]);
+	char* leerMapaBits(char[], int, int, int, int);
+	int check(char,int);
+	long encontrarEspacio(char [20],int, int, int, int, int, int,int);
+	void printMapa();
+
 };
 
 
@@ -71,71 +108,116 @@ private:
 class EntradasDirectorio
 {
 private:
+	DataFile* file;
+	int nEntradasDirectorio;
+
 	struct Entrada
 	{
 		char nombreEntrada[30];
-		bool esArchivo; // 1->File, 0->Folder
+		bool esArchivo;
 		unsigned int tamanio;
 
-		/////////////////////////////////////////////////////////////////////////////
 		short int indPadre;
 		short int indPrimerHijo;
 		short int indHermanoDerecho;
 
-		char fechaCreacion[8]; //ddMMyyyy
-		//punterosabloques de datos (Importacion de archivos)
+
+		char fechaCreacion[8]; 
+	
 		unsigned int ptrsBD[12];
-		unsigned int ptrsBDI[3]; //[0] -> BI1, [1] -> BI2, [2] -> BI3
+		unsigned int ptrsBDI[3]; 
 
 
 	};
 
-	Entrada* lista;
-	EntradasDirectorio()
-	{
-		//comentado porque da error
-		// lista = new Entrada[md.cantidadEntradasDirectorio];
-	}
+public:
+	Entrada* listaEntradas;
+	EntradasDirectorio(char[20], int);
+	void print();
+	int getSizeOf();
 
-	void write()
-	{
-
-	}
-
+	char* toChar();
+	void fromChar(char*);
+	void comandoMKDIR(char[20], long, char[30], char[30]);
+	void write(char[20], long);
+	void read(char[20], long);
+	void agregarLista(Entrada*, char[20], long,int, char[30]);
+	Entrada* getLista(char[20], long);
+	int existe(char[20], long, char[30]);
+	void comandoLS(char[20], long, char[30]);
 };
 
-class tipoBloque
+class BloqueDirecto 
 {
 public:
-	virtual char* toChar() = 0;
-	virtual void fromChar(char*) = 0;
-};
+	BloqueDirecto(int, char[20], long, int);
+	BloqueDirecto(char[20]);
+	void read(int, char[20], long);
 
-class BloqueDirecto :public tipoBloque
-{
+
 private:
+	int nEntradasDirectorio;
+	DataFile* file;
 	char data[4096];//4kb:
+	char* toChar();
+	void insertarDatos();
+	void fromChar(char*);
+	void write(int, char[20], long);
+	int getsizeOf();
+	void print();
 };
 
 
-class BloqueInd1Nivel : public tipoBloque
+class BloqueInd1Nivel 
 {
+public:
+	BloqueInd1Nivel();
+	BloqueInd1Nivel(char[20], int, long);
+	void write();
+	void read();
+	void insertarDatos();
+	char* toChar();
+	void fromChar(char*);
+
 private:
-	unsigned int ptrs[16]; // [0]
+	int nEntradasDirectorio;
+	long mapaBits;
+	DataFile* file;
+	unsigned int ptrs[16];
+};
+//
+class BloqueInd2Nivel 
+{
+public:
+	BloqueInd2Nivel(char[20], int, long);
+	BloqueInd2Nivel();
+	void write();
+	void read();
+	void insertarDatos();
+	char* toChar();
+	void fromChar(char*);
+
+private:
+	int nEntradasDirectorio;
+	long mapaBits;
+	DataFile* file;
+	unsigned int ptrs[32];
 };
 
-class BloqueInd2Nivel : public tipoBloque
+class BloqueInd3Nivel 
 {
-private:
-	unsigned int ptrs[32]; // [0]=di
-};
+public:
+	BloqueInd3Nivel(char[20], int, long);
+	BloqueInd3Nivel();
+	void write();
+	void read();
+	void insertarDatos();
+	char* toChar();
+	void fromChar(char*);
 
-class BloqueInd3Nivel :public tipoBloque
-{
 private:
+	int nEntradasDirectorio;
+	long mapaBits;
+	DataFile* file;
 	unsigned int ptrs[64];
 };
-
-//$ create disk "Disco" 100
-
-//$ create disk "miDisco"
